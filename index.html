@@ -3,147 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gael Toys Pro</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gael Toys">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#011627">
+
+    <title>Gael Toys Pro 🧸</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    
     <style>
         :root {
             --primary: #4361ee; --success: #2ec4b6; --danger: #e71d36;
             --warning: #ff9f1c; --dark: #011627; --light: #f8f9fa; --white: #ffffff;
+            --royal: #7209b7;
         }
         
-        /* Ajustes para que parezca APP Real */
         * { user-select: none; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         
         body { 
             font-family: -apple-system, system-ui, sans-serif; 
-            background: var(--dark); 
-            margin: 0; 
-            color: var(--white); 
-            height: 100vh; 
-            width: 100vw;
-            overflow: hidden; /* Evita que la pantalla rebote */
-            position: fixed;
+            background: var(--dark); margin: 0; color: var(--white); 
+            height: 100vh; width: 100vw; overflow: hidden; position: fixed;
         }
 
+        /* Contenedor Principal */
         .app-container { 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 15px;
-            padding-bottom: 90px; /* Espacio para el menú inferior */
+            height: 100vh; display: flex; flex-direction: column; 
+            padding: env(safe-area-inset-top) 15px 90px 15px; /* Espacio para el menú inferior */
         }
 
-        /* Cámara fija */
+        /* Logo del Osito */
+        .header-logo { text-align: center; padding: 10px 0; }
+        .header-logo span { font-size: 45px; display: block; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
+        .header-logo h2 { margin: 5px 0 0 0; font-size: 18px; letter-spacing: 2px; font-weight: 800; }
+
+        /* Cámara */
         #reader { 
-            width: 100%; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            background: #000; 
-            border: 2px solid rgba(255,255,255,0.1);
-            aspect-ratio: 1/1; /* Mantiene la cámara cuadrada */
+            width: 100%; border-radius: 25px; overflow: hidden; 
+            background: #000; border: 2px solid rgba(255,255,255,0.1);
+            aspect-ratio: 1/1; margin-top: 5px;
         }
 
+        /* Dashboards */
         .main-dash { 
-            background: rgba(255,255,255,0.07); 
-            border-radius: 20px; 
-            padding: 12px; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px;
-            margin-top: 10px;
+            background: rgba(255,255,255,0.07); border-radius: 20px; 
+            padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0;
         }
-        .dash-item b { font-size: 18px; color: var(--success); display: block; }
+        .dash-item b { font-size: 19px; color: var(--success); display: block; }
         .dash-item span { font-size: 9px; color: #888; text-transform: uppercase; }
 
-        .action-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            margin-top: 10px;
-        }
-        .btn-big { 
-            padding: 15px; 
-            border: none; 
-            border-radius: 15px; 
-            font-size: 13px; 
-            font-weight: bold; 
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
+        /* Botones Acción */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-big { padding: 18px; border: none; border-radius: 18px; font-size: 14px; font-weight: bold; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
-        /* Menú Inferior Estilo iPhone */
+        /* Menú Inferior Estilo App */
         .nav-menu { 
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background: #1e293b;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            padding: 10px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
+            background: #1e293b; display: grid; grid-template-columns: repeat(4, 1fr);
+            padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255,255,255,0.1);
             z-index: 1000;
         }
-        .btn-nav { 
-            background: transparent; 
-            border: none; 
-            color: #888; 
-            font-size: 9px; 
-            font-weight: bold;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+        .btn-nav { background: transparent; border: none; color: #888; font-size: 10px; font-weight: bold; cursor: pointer; }
         .btn-nav.active-btn { color: var(--success); }
 
-        /* Paneles que se deslizan */
+        /* Paneles */
         .view-panel { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: var(--light); 
-            color: var(--dark); 
-            z-index: 2000; 
-            padding: 20px;
-            padding-bottom: 100px;
-            overflow-y: auto; /* Solo el contenido del panel scrollea */
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--light); color: var(--dark); z-index: 2000; padding: 25px; 
+            padding-bottom: 100px; overflow-y: auto;
         }
+        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-close { background: var(--dark); color: white; border: none; padding: 10px 18px; border-radius: 12px; font-weight: bold; }
 
-        .card { 
-            background: white; 
-            border-radius: 12px; 
-            padding: 12px; 
-            margin-bottom: 8px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .tab-container { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-size: 11px; font-weight: bold; background: #ddd; }
+        .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; }
+        
+        .tab-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; background: #ddd; font-size: 11px; }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        #btn-cerrar-camara { display: none; background: var(--danger); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; margin-top: 5px; font-weight: bold; }
+        .fin-card { background: var(--dark); color: white; padding: 18px; border-radius: 20px; margin-bottom: 15px; border-left: 6px solid gold; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h3 style="text-align:center; margin: 0 0 10px 0; letter-spacing: 1px;">GAEL TOYS 👑</h3>
+    <div class="header-logo">
+        <span>🧸</span>
+        <h2>GAEL TOYS PRO</h2>
+    </div>
     
     <div id="scanner-wrap">
         <div id="reader"></div>
-        <button id="btn-cerrar-camara" onclick="detenerEscaneo()">❌ CANCELAR ESCANEO</button>
+        <button id="btn-cerrar-camara" onclick="detenerEscaneo()" style="display:none; width:100%; background:var(--danger); border:none; color:white; padding:12px; border-radius:15px; margin-top:8px; font-weight:bold;">❌ CANCELAR ESCANEO</button>
     </div>
 
     <div class="main-dash">
-        <div class="dash-item"><span>💰 EN CAJA</span><b id="dash-caja">$0</b></div>
-        <div class="dash-item"><span>📦 STOCK</span><b id="dash-stock">0</b></div>
+        <div class="dash-item"><span>💰 CAJA TURNO</span><b id="dash-caja">$0</b></div>
+        <div class="dash-item"><span>📦 STOCK TOTAL</span><b id="dash-stock">0</b></div>
     </div>
 
     <div class="action-grid">
@@ -160,61 +118,44 @@
 </div>
 
 <div id="panel-inventario" class="view-panel">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3>Inventario</h3>
-        <button class="btn-x" onclick="cerrarPanel('panel-inventario')" style="background:var(--dark); color:white; border:none; padding:8px 15px; border-radius:10px;">CERRAR</button>
-    </div>
-    <input type="text" id="buscador" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; margin:15px 0;" placeholder="🔍 Buscar juguete..." onkeyup="filtrarInventario()">
+    <div class="header-panel"><h3>📦 Inventario</h3><button class="btn-close" onclick="cerrarPanel('panel-inventario')">VOLVER</button></div>
+    <input type="text" id="buscador" style="width:100%; padding:14px; border-radius:15px; border:1px solid #ddd; margin-bottom:15px; font-size:16px;" placeholder="🔍 Buscar juguete..." onkeyup="filtrarInventario()">
     <div id="lista-inventario"></div>
 </div>
 
 <div id="panel-ventas" class="view-panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Ventas</h3>
-        <button onclick="cerrarPanel('panel-ventas')" style="background:var(--dark); color:white; border:none; padding:8px 15px; border-radius:10px;">CERRAR</button>
-    </div>
+    <div class="header-panel"><h3>📋 Ventas</h3><button class="btn-close" onclick="cerrarPanel('panel-ventas')">VOLVER</button></div>
     <div class="tab-container">
-        <button class="tab-btn active" id="tab1" onclick="switchVentas('turno')">DEL TURNO</button>
+        <button class="tab-btn active" id="tab1" onclick="switchVentas('turno')">ESTE TURNO</button>
         <button class="tab-btn" id="tab2" onclick="switchVentas('general')">HISTORIAL TOTAL</button>
     </div>
-    <div id="cont-turno"> <div id="lista-ventas"></div> </div>
-    <div id="cont-general" style="display:none;"> <div id="lista-ventas-general"></div> </div>
+    <div id="lista-ventas"></div>
 </div>
 
 <div id="panel-finanzas" class="view-panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Finanzas</h3>
-        <button onclick="cerrarPanel('panel-finanzas')" style="background:var(--dark); color:white; border:none; padding:8px 15px; border-radius:10px;">CERRAR</button>
+    <div class="header-panel"><h3>💵 Finanzas</h3><button class="btn-close" onclick="cerrarPanel('panel-finanzas')">VOLVER</button></div>
+    <div class="fin-card">
+        <h4 style="margin:0; font-size:10px; color:#aaa;">👑 CAJA GLOBAL ACUMULADA</h4>
+        <p id="fin-global" style="font-size:32px; margin:5px 0; color:gold; font-weight:bold;">$0</p>
     </div>
-    
-    <div style="background:black; color:gold; padding:15px; border-radius:15px; text-align:center; border:2px solid gold; margin-bottom:10px;">
-        <span style="font-size:10px;">👑 TOTAL ACUMULADO</span>
-        <h2 id="fin-global" style="margin:5px 0;">$0</h2>
-    </div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-        <div style="background:white; padding:10px; border-radius:12px; border:1px solid #ddd;">
-            <span style="font-size:9px; color:#888;">MÁS VENDIDO</span>
-            <div id="top-mas" style="font-size:11px; font-weight:bold; color:var(--success);">--</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; color:white;">
+        <div style="background:var(--dark); padding:10px; border-radius:15px;">
+            <span style="font-size:9px;">MÁS VENDIDO 🔥</span>
+            <div id="top-mas" style="font-size:11px; font-weight:bold; color:var(--success);">---</div>
         </div>
-        <div style="background:white; padding:10px; border-radius:12px; border:1px solid #ddd;">
-            <span style="font-size:9px; color:#888;">MENOS VENDIDO</span>
-            <div id="top-menos" style="font-size:11px; font-weight:bold; color:var(--danger);">--</div>
+        <div style="background:var(--dark); padding:10px; border-radius:15px;">
+            <span style="font-size:9px;">MENOS VENDIDO ❄️</span>
+            <div id="top-menos" style="font-size:11px; font-weight:bold; color:var(--danger);">---</div>
         </div>
     </div>
-
-    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:15px; border-radius:15px; border:none; font-weight:bold; margin-bottom:20px;">🏁 HACER CORTE DE CAJA</button>
-    
-    <h4 style="margin-bottom:10px;">Cortes Pasados</h4>
+    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:18px; border:none; font-weight:bold; margin-bottom:20px;">🏁 CERRAR TURNO (CORTE)</button>
+    <h4>Cortes anteriores</h4>
     <div id="lista-cortes"></div>
 </div>
 
 <div id="panel-pedidos" class="view-panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Pedidos</h3>
-        <button onclick="cerrarPanel('panel-pedidos')" style="background:var(--dark); color:white; border:none; padding:8px 15px; border-radius:10px;">CERRAR</button>
-    </div>
-    <button onclick="crearPedido()" style="width:100%; padding:15px; background:var(--royal); color:white; border:none; border-radius:15px; font-weight:bold; margin-bottom:15px;">+ NUEVO PEDIDO</button>
+    <div class="header-panel"><h3>📝 Pedidos</h3><button class="btn-close" onclick="cerrarPanel('panel-pedidos')">VOLVER</button></div>
+    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:15px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR FALTANTE</button>
     <div id="lista-pedidos"></div>
 </div>
 
@@ -236,22 +177,14 @@
     const db = getDatabase(app);
     const scanner = new Html5Qrcode("reader");
 
-    let cajaT = 0; let ganT = 0;
+    let cajaT = 0; let ganT = 0; let vistaVentas = 'turno';
 
     window.abrirPanel = (id) => document.getElementById(id).style.display = 'block';
     window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
 
-    window.switchVentas = (tipo) => {
-        const isTurno = tipo === 'turno';
-        document.getElementById('cont-turno').style.display = isTurno ? 'block' : 'none';
-        document.getElementById('cont-general').style.display = isTurno ? 'none' : 'block';
-        document.getElementById('tab1').classList.toggle('active', isTurno);
-        document.getElementById('tab2').classList.toggle('active', !isTurno);
-    };
-
     window.iniciarEscaneo = (modo) => {
         document.getElementById('btn-cerrar-camara').style.display = 'block';
-        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 220 }, (codigo) => {
+        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (codigo) => {
             detenerEscaneo();
             procesar(codigo, modo);
         });
@@ -269,7 +202,10 @@
                 const c = prompt(`Sumar stock a: ${snap.val().nombre}`, "1");
                 if (c) update(refP, { existencia: snap.val().existencia + parseInt(c) });
             } else {
-                const n = prompt("Nombre:"); const co = prompt("Costo:"); const pr = prompt("Venta:"); const ex = prompt("Stock:", "1");
+                const n = prompt("Nombre del Juguete:");
+                const co = prompt("Precio de COSTO:");
+                const pr = prompt("Precio de VENTA:");
+                const ex = prompt("Stock Inicial:", "1");
                 if (n) set(refP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) });
             }
         } else {
@@ -286,50 +222,61 @@
         }
     }
 
+    // CARGAR VENTAS SEGÚN VISTA
+    window.switchVentas = (tipo) => {
+        vistaVentas = tipo;
+        document.getElementById('tab1').classList.toggle('active', tipo === 'turno');
+        document.getElementById('tab2').classList.toggle('active', tipo === 'general');
+        renderVentas();
+    };
+
+    function renderVentas() {
+        const path = vistaVentas === 'turno' ? 'ventas_actuales/' : 'ventas_generales/';
+        onValue(ref(db, path), (snap) => {
+            const list = document.getElementById('lista-ventas'); list.innerHTML = "";
+            snap.forEach(h => {
+                const v = h.val();
+                list.innerHTML = `<div class="card"><div><b>${v.nombre}</b><br><small>${v.fecha} - ${v.hora}</small></div><b>$${v.precio}</b></div>` + list.innerHTML;
+            });
+        }, { onlyOnce: true });
+    }
+
     onValue(ref(db, 'ventas_actuales/'), (snap) => {
         cajaT = 0; ganT = 0;
-        const list = document.getElementById('lista-ventas'); list.innerHTML = "";
-        snap.forEach(h => {
-            const v = h.val(); cajaT += v.precio; ganT += (v.precio - v.costo);
-            list.innerHTML = `<div class="card"><div><b>${v.nombre}</b><br><small>${v.hora}</small></div><b>$${v.precio}</b></div>` + list.innerHTML;
-        });
+        snap.forEach(h => { cajaT += h.val().precio; ganT += (h.val().precio - h.val().costo); });
         document.getElementById('dash-caja').innerText = "$" + cajaT;
-    });
-
-    onValue(ref(db, 'ventas_generales/'), (snap) => {
-        const list = document.getElementById('lista-ventas-general'); list.innerHTML = "";
-        snap.forEach(h => {
-            const v = h.val();
-            list.innerHTML = `<div class="card" style="border-left: 3px solid var(--primary)"><div><b>${v.nombre}</b><br><small>${v.fecha}</small></div><b>$${v.precio}</b></div>` + list.innerHTML;
-        });
+        if(vistaVentas === 'turno') renderVentas();
     });
 
     onValue(ref(db, 'juguetes/'), (snap) => {
         let st = 0; const list = document.getElementById('lista-inventario'); list.innerHTML = "";
         snap.forEach(h => {
             const p = h.val(); st += p.existencia;
-            list.innerHTML += `<div class="card"><div><b>${p.nombre}</b><br><small>$${p.precio}</small></div><b style="color:var(--primary)">${p.existencia} pz</b></div>`;
+            list.innerHTML += `<div class="card" data-search="${p.nombre.toLowerCase()}"><div><b>${p.nombre}</b><br><small>$${p.precio}</small></div><b style="color:var(--primary)">${p.existencia} pz</b></div>`;
         });
         document.getElementById('dash-stock').innerText = st;
     });
 
     onValue(ref(db, 'historial_cortes/'), (snap) => {
-        let glob = 0; let conteo = {};
-        const list = document.getElementById('lista-cortes'); list.innerHTML = "";
+        let glob = 0; let conteo = {}; const list = document.getElementById('lista-cortes'); list.innerHTML = "";
         snap.forEach(h => {
             const c = h.val(); glob += c.total_venta;
             if(c.detalles) c.detalles.forEach(p => { conteo[p.nombre] = (conteo[p.nombre] || 0) + 1; });
-            list.innerHTML = `<div class="card" style="font-size:11px;"><b>${c.fecha}</b><b>$${c.total_venta}</b></div>` + list.innerHTML;
+            list.innerHTML = `<div class="card" style="display:block; font-size:11px;"><b>${c.fecha}</b><br>Total: $${c.total_venta}</div>` + list.innerHTML;
         });
-        let masV = { n: "---", c: 0 };
-        for (let n in conteo) { if (conteo[n] > masV.c) masV = { n: n, c: conteo[n] }; }
-        document.getElementById('top-mas').innerText = masV.n;
+        let masV = { n: "---", c: 0 }; let menosV = { n: "---", c: Infinity };
+        for (let n in conteo) {
+            if (conteo[n] > masV.c) masV = { n: n, c: conteo[n] };
+            if (conteo[n] < menosV.c) menosV = { n: n, c: conteo[n] };
+        }
+        document.getElementById('top-mas').innerText = masV.n + " ("+masV.c+")";
+        document.getElementById('top-menos').innerText = (menosV.n === '---' ? '---' : menosV.n + " ("+menosV.c+")");
         document.getElementById('fin-global').innerText = "$" + glob;
     });
 
     window.realizarCorte = async () => {
-        if (cajaT === 0) return alert("Caja vacía");
-        if (confirm(`¿Hacer corte por $${cajaT}?`)) {
+        if (cajaT === 0) return alert("No hay ventas para cerrar.");
+        if (confirm(`¿Cerrar turno con $${cajaT}?`)) {
             const vSnap = await get(ref(db, 'ventas_actuales/')); let vtas = [];
             vSnap.forEach(x => vtas.push(x.val()));
             await push(ref(db, 'historial_cortes/'), { total_venta: cajaT, total_ganancia: ganT, fecha: new Date().toLocaleString(), detalles: vtas });
@@ -349,8 +296,9 @@
 
     window.filtrarInventario = () => {
         const q = document.getElementById('buscador').value.toLowerCase();
-        const cards = document.querySelectorAll('#lista-inventario .card');
-        cards.forEach(c => { c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none'; });
+        document.querySelectorAll('#lista-inventario .card').forEach(c => {
+            c.style.display = c.getAttribute('data-search').includes(q) ? 'flex' : 'none';
+        });
     };
 </script>
 </body>
