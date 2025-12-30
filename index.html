@@ -3,38 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario Gael</title>
+    <title>Juguetería Gael - Punto de Venta</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
-        .container { background: white; max-width: 400px; margin: auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #reader { width: 100%; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ccc; }
-        button { padding: 15px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; width: 45%; }
-        .btn-add { background: #28a745; }
-        .btn-sell { background: #dc3545; }
-        ul { list-style: none; padding: 0; margin-top: 20px; text-align: left; }
-        li { background: #fff; border-bottom: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between; }
+        :root {
+            --primary: #4361ee; --success: #2ec4b6; --danger: #e71d36;
+            --warning: #ff9f1c; --dark: #011627; --light: #f1f2f6; --gray: #888;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 10px; color: var(--dark); }
+        .app-container { max-width: 480px; margin: auto; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 20px; }
+        
+        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; margin-bottom: 15px; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        button { padding: 15px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; }
+        .btn-add { background: var(--primary); }
+        .btn-sell { background: var(--danger); }
+        
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; background: var(--dark); color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; gap: 10px; }
+        .dash-item span { display: block; font-size: 10px; color: var(--gray); text-transform: uppercase; }
+        .dash-item b { font-size: 16px; color: var(--success); }
+        
+        .cash-box { grid-column: span 2; border-top: 1px solid #333; pt: 10px; margin-top: 5px; text-align: center; }
+        .cash-box b { font-size: 22px; color: var(--success); }
+
+        .search-bar { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
+
+        .product-card {
+            background: white; border: 1px solid #eee; padding: 12px; border-radius: 15px;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+            border-left: 5px solid var(--primary);
+        }
+        
+        /* Alerta de Stock Bajo */
+        .qty-badge { padding: 6px 12px; border-radius: 12px; font-weight: bold; font-size: 14px; margin-right: 12px; color: white; }
+        .stock-ok { background: var(--primary); }
+        .stock-low { background: var(--warning); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        .product-info { flex-grow: 1; }
+        .product-info b { font-size: 15px; display: block; }
+        .product-info small { color: var(--gray); font-size: 11px; }
+        
+        .price-section { text-align: right; }
+        .price-tag { color: var(--primary); font-weight: bold; font-size: 15px; display: block; }
+        .edit-btn { background: none; color: var(--primary); border: none; font-size: 11px; text-decoration: underline; padding: 0; cursor: pointer; margin-top: 5px; }
+        
+        .btn-reset { margin-top: 30px; background: none; color: var(--gray); font-size: 11px; width: 100%; text-decoration: underline; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>🧸 Inventario Gael</h2>
+<div class="app-container">
+    <h2 style="text-align: center;">🧸 MUNDO DE SONRISAS  🧸</h2>
     <div id="reader"></div>
-    <p id="status">Elige una acción:</p>
-    
-    <button class="btn-add" onclick="empezarEscaneo('agregar')">AGREGAR</button>
-    <button class="btn-sell" onclick="empezarEscaneo('vender')">VENDER</button>
+    <div id="status" style="text-align:center; margin-bottom:10px; font-weight:bold; color:var(--primary);">Sistema Listo</div>
 
-    <h3>Lista de Juguetes:</h3>
-    <ul id="lista"></ul>
+    <div class="btn-group">
+        <button class="btn-add" onclick="iniciarEscaneo('agregar')">📥 Recibir</button>
+        <button class="btn-sell" onclick="iniciarEscaneo('vender')">💰 Vender</button>
+    </div>
+
+    <div class="dashboard">
+        <div class="dash-item"><span>Stock Total</span><b id="count-stock">0</b></div>
+        <div class="dash-item"><span>Ventas Hoy</span><b id="count-sales">0</b></div>
+        <div class="dash-item cash-box">
+            <span>💸 Dinero en Caja (Hoy)</span>
+            <b id="cash-total">$0</b>
+        </div>
+    </div>
+
+    <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar por nombre..." onkeyup="filtrarLista()">
+
+    <div class="inventory-list">
+        <h3>Inventario</h3>
+        <div id="lista-html"></div>
+    </div>
+
+    <button class="btn-reset" onclick="reinicioMaestro()">⚙️ Reiniciar Base de Datos</button>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, set, update, remove, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // TUS DATOS REALES YA INSERTADOS:
     const firebaseConfig = {
         apiKey: "AIzaSyCI85dhteJ5Z4Wgb2A0pes0RI-KdaTAQlM",
         authDomain: "miinventariojuguetes.firebaseapp.com",
@@ -48,41 +100,134 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const html5QrCode = new Html5Qrcode("reader");
+    const scanner = new Html5Qrcode("reader");
     let modo = "";
 
-    window.empezarEscaneo = (accion) => {
+    window.iniciarEscaneo = (accion) => {
         modo = accion;
-        document.getElementById('status').innerText = "📷 Escaneando para " + accion + "...";
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (codigo) => {
-            html5QrCode.stop();
-            gestionarProducto(codigo);
+        document.getElementById('status').innerText = "📷 Escaneando...";
+        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (codigo) => {
+            scanner.stop();
+            procesarCodigo(codigo);
+        }).catch(err => alert("Error de cámara: " + err));
+    };
+
+    async function procesarCodigo(codigo) {
+        const itemRef = ref(db, 'juguetes/' + codigo);
+        const snapshot = await get(itemRef);
+
+        if (modo === 'agregar') {
+            if (snapshot.exists()) {
+                const actual = snapshot.val();
+                const cantidadNueva = prompt(`¿Cuántas piezas de "${actual.nombre}" vas a SUMAR?`, "1");
+                if (cantidadNueva) {
+                    const totalExistencia = (parseInt(actual.existencia) || 0) + parseInt(cantidadNueva);
+                    update(itemRef, { existencia: totalExistencia });
+                }
+            } else {
+                const nombre = prompt("Nombre del nuevo juguete:");
+                const costo = prompt("Precio de costo (inversión):", "0");
+                const precio = prompt("Precio de venta:", "0");
+                const existencia = prompt("¿Cuántas piezas entran?", "1");
+                if (nombre) {
+                    set(itemRef, {
+                        nombre, id: codigo, costo: parseFloat(costo) || 0, precio: parseFloat(precio) || 0, 
+                        existencia: parseInt(existencia) || 0, fechaRegistro: new Date().toLocaleString()
+                    });
+                }
+            }
+        } else if (modo === 'vender') {
+            if (snapshot.exists()) {
+                const d = snapshot.val();
+                const stockActual = parseInt(d.existencia) || 0;
+                if(confirm(`¿Vender 1 unidad de ${d.nombre}?`)) {
+                    // Registro detallado de venta
+                    push(ref(db, 'ventas/'), { 
+                        nombre: d.nombre, 
+                        precio: d.precio, 
+                        costo: d.costo,
+                        fechaVenta: new Date().toLocaleString(),
+                        id: d.id
+                    });
+                    
+                    if (stockActual > 1) {
+                        update(itemRef, { existencia: stockActual - 1 });
+                    } else {
+                        remove(itemRef);
+                    }
+                    document.getElementById('status').innerText = "💰 ¡Venta Exitosa!";
+                }
+            } else { alert("Error: El producto no existe en el inventario."); }
+        }
+    }
+
+    window.editarItem = (id, nombre, precio, costo, existencia) => {
+        const nPrecio = prompt(`Nuevo precio para ${nombre}:`, precio);
+        const nExistencia = prompt(`Nueva cantidad para ${nombre}:`, existencia);
+        if (nPrecio !== null && nExistencia !== null) {
+            update(ref(db, 'juguetes/' + id), { 
+                precio: parseFloat(nPrecio) || 0, 
+                existencia: parseInt(nExistencia) || 0 
+            });
+        }
+    };
+
+    // Actualización de Inventario y Alertas
+    onValue(ref(db, 'juguetes/'), (snapshot) => {
+        const contenedor = document.getElementById('lista-html');
+        contenedor.innerHTML = "";
+        let totalPiezas = 0;
+
+        snapshot.forEach((hijo) => {
+            const p = hijo.val();
+            const existencia = parseInt(p.existencia) || 0;
+            const precio = parseFloat(p.precio) || 0;
+            
+            totalPiezas += existencia;
+            const alertaClase = existencia <= 2 ? 'stock-low' : 'stock-ok';
+            
+            contenedor.innerHTML += `
+                <div class="product-card" data-nombre="${p.nombre.toLowerCase()}">
+                    <div class="qty-badge ${alertaClase}">${existencia}</div>
+                    <div class="product-info">
+                        <b>${p.nombre}</b>
+                        <small>ID: ${p.id}</small>
+                        <button class="edit-btn" onclick="editarItem('${p.id}', '${p.nombre}', ${precio}, ${p.costo}, ${existencia})">Editar</button>
+                    </div>
+                    <div class="price-section">
+                        <span class="price-tag">$${precio}</span>
+                    </div>
+                </div>`;
+        });
+        document.getElementById('count-stock').innerText = totalPiezas;
+    });
+
+    // Reporte de Ventas y Dinero en Caja
+    onValue(ref(db, 'ventas/'), (snap) => {
+        let totalCaja = 0;
+        let numVentas = 0;
+        snap.forEach((hijo) => {
+            const v = hijo.val();
+            totalCaja += parseFloat(v.precio) || 0;
+            numVentas++;
+        });
+        document.getElementById('count-sales').innerText = numVentas;
+        document.getElementById('cash-total').innerText = "$" + totalCaja;
+    });
+
+    window.filtrarLista = () => {
+        const busqueda = document.getElementById('buscador').value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(card => {
+            const nombre = card.getAttribute('data-nombre');
+            card.style.display = nombre.includes(busqueda) ? 'flex' : 'none';
         });
     };
 
-    function gestionarProducto(id) {
-        if (modo === "agregar") {
-            const nombre = prompt("Nombre del juguete:");
-            if (nombre) {
-                set(ref(db, 'juguetes/' + id), { nombre: nombre, id: id });
-            }
-        } else {
-            remove(ref(db, 'juguetes/' + id));
-            alert("Vendido: " + id);
+    window.reinicioMaestro = () => {
+        if (prompt("Clave Maestra:") === "Gael2025") {
+            if(confirm("¿Borrar todo?")) set(ref(db, '/'), null);
         }
-        document.getElementById('status').innerText = "Listo. Elige otra acción.";
-    }
-
-    onValue(ref(db, 'juguetes/'), (snapshot) => {
-        const listaUI = document.getElementById('lista');
-        listaUI.innerHTML = "";
-        snapshot.forEach((child) => {
-            const data = child.val();
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${data.nombre}</span> <small>${data.id}</small>`;
-            listaUI.appendChild(li);
-        });
-    });
+    };
 </script>
 </body>
 </html>
