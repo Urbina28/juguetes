@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario Gael</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .container { background: white; max-width: 400px; margin: auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #reader { width: 100%; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ccc; }
+        button { padding: 15px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; width: 45%; }
+        .btn-add { background: #28a745; }
+        .btn-sell { background: #dc3545; }
+        ul { list-style: none; padding: 0; margin-top: 20px; text-align: left; }
+        li { background: #fff; border-bottom: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🧸 Inventario Gael</h2>
+    <div id="reader"></div>
+    <p id="status">Elige una acción:</p>
+    
+    <button class="btn-add" onclick="empezarEscaneo('agregar')">AGREGAR</button>
+    <button class="btn-sell" onclick="empezarEscaneo('vender')">VENDER</button>
+
+    <h3>Lista de Juguetes:</h3>
+    <ul id="lista"></ul>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // TUS DATOS REALES YA INSERTADOS:
+    const firebaseConfig = {
+        apiKey: "AIzaSyCI85dhteJ5Z4Wgb2A0pes0RI-KdaTAQlM",
+        authDomain: "miinventariojuguetes.firebaseapp.com",
+        databaseURL: "https://miinventariojuguetes-default-rtdb.firebaseio.com/",
+        projectId: "miinventariojuguetes",
+        storageBucket: "miinventariojuguetes.firebasestorage.app",
+        messagingSenderId: "872070944528",
+        appId: "1:872070944528:web:aeb9deab706b6de0dcb795",
+        measurementId: "G-2SG32BF2G0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const html5QrCode = new Html5Qrcode("reader");
+    let modo = "";
+
+    window.empezarEscaneo = (accion) => {
+        modo = accion;
+        document.getElementById('status').innerText = "📷 Escaneando para " + accion + "...";
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (codigo) => {
+            html5QrCode.stop();
+            gestionarProducto(codigo);
+        });
+    };
+
+    function gestionarProducto(id) {
+        if (modo === "agregar") {
+            const nombre = prompt("Nombre del juguete:");
+            if (nombre) {
+                set(ref(db, 'juguetes/' + id), { nombre: nombre, id: id });
+            }
+        } else {
+            remove(ref(db, 'juguetes/' + id));
+            alert("Vendido: " + id);
+        }
+        document.getElementById('status').innerText = "Listo. Elige otra acción.";
+    }
+
+    onValue(ref(db, 'juguetes/'), (snapshot) => {
+        const listaUI = document.getElementById('lista');
+        listaUI.innerHTML = "";
+        snapshot.forEach((child) => {
+            const data = child.val();
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${data.nombre}</span> <small>${data.id}</small>`;
+            listaUI.appendChild(li);
+        });
+    });
+</script>
+</body>
+</html>
