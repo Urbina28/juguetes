@@ -5,172 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gael Toys 🧸</title>
+    <title>Gael Toys Pro 🧸</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
             --primary: #4361ee; --success: #2ec4b6; --danger: #e71d36;
-            --warning: #ff9f1c; --dark: #011627; --white: #ffffff;
+            --warning: #ff9f1c; --dark: #011627; --light: #f8f9fa; --white: #ffffff;
+            --royal: #7209b7;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        
         body { 
             font-family: -apple-system, sans-serif; background: var(--dark); 
-            margin: 0; color: white; height: 100vh; overflow: hidden; 
+            margin: 0; color: white; height: 100vh; overflow: hidden; position: fixed; width: 100%;
         }
 
-        /* Cabecera */
-        .header { text-align: center; padding: 15px 0 5px 0; }
-        .header .oso { font-size: 35px; display: block; }
-        .header h2 { margin: 0; font-size: 16px; letter-spacing: 2px; }
+        .app-container { height: 100vh; display: flex; flex-direction: column; padding: env(safe-area-inset-top) 15px 85px 15px; }
 
-        /* Contenedor de la cámara */
-        #scanner-container {
-            width: 85%; margin: 10px auto; position: relative;
-            border-radius: 20px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1);
-            aspect-ratio: 1/1; background: #000;
-        }
+        .header { text-align: center; padding: 10px 0; }
+        .header span { font-size: 40px; display: block; }
+        .header h2 { margin: 5px 0; font-size: 18px; letter-spacing: 2px; }
 
-        /* Dashboard de dinero y stock */
-        .stats-bar {
-            display: flex; gap: 10px; padding: 0 20px; margin-bottom: 15px;
-        }
-        .stat-card {
-            flex: 1; background: rgba(255,255,255,0.1); padding: 10px;
-            border-radius: 15px; text-align: center;
-        }
-        .stat-card span { font-size: 9px; color: #aaa; display: block; text-transform: uppercase; }
-        .stat-card b { font-size: 18px; color: var(--success); }
+        #scanner-wrap { width: 100%; max-width: 280px; margin: 0 auto; }
+        #reader { width: 100%; border-radius: 20px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); background: #000; aspect-ratio: 1/1; }
+        #btn-cancelar { display: none; width: 100%; background: var(--danger); border: none; color: white; padding: 12px; border-radius: 12px; margin-top: 8px; font-weight: bold; }
 
-        /* Botones principales */
-        .btn-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px;
-        }
-        .btn-main {
-            padding: 15px; border: none; border-radius: 15px; color: white;
-            font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+        .main-dash { background: rgba(255,255,255,0.07); border-radius: 20px; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .dash-item b { font-size: 20px; color: var(--success); display: block; }
+        .dash-item span { font-size: 9px; color: #888; text-transform: uppercase; }
 
-        /* Menú inferior (Fijo) */
-        .nav-bar {
-            position: fixed; bottom: 0; width: 100%; height: 75px;
-            background: #16213e; display: flex; justify-content: space-around;
-            align-items: center; border-top: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .nav-item {
-            background: none; border: none; color: #888; font-size: 10px;
-            font-weight: bold; display: flex; flex-direction: column; align-items: center;
-        }
-        .nav-item span { font-size: 20px; margin-bottom: 2px; }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-big { padding: 18px; border: none; border-radius: 18px; font-size: 14px; font-weight: bold; color: white; }
 
-        /* Paneles (Se abren sobre la app) */
-        .panel {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #f0f2f5; color: #333; z-index: 1000; padding: 20px;
-            padding-bottom: 90px; overflow-y: auto;
-        }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-close { background: var(--dark); color: white; border: none; padding: 8px 15px; border-radius: 10px; }
+        .nav-menu { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: #1e293b; display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom); z-index: 1000; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-nav { background: transparent; border: none; color: #888; font-size: 9px; font-weight: bold; }
 
-        .item-card {
-            background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+        .view-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light); color: var(--dark); z-index: 2000; padding: 25px; overflow-y: auto; padding-bottom: 100px; }
+        .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-x { background: var(--dark); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; }
+        
+        .card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-box { background: white; padding: 12px; border-radius: 15px; border: 1px solid #ddd; }
+        .stat-box span { font-size: 9px; color: #888; display: block; }
+        .stat-box b { font-size: 13px; color: var(--dark); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <span class="oso">🧸</span>
-        <h2>GAEL TOYS PRO</h2>
-    </div>
-
-    <div id="scanner-container">
+<div class="app-container">
+    <div class="header"><span>🧸</span><h2>GAEL TOYS PRO</h2></div>
+    <div id="scanner-wrap">
         <div id="reader"></div>
+        <button id="btn-cancelar" onclick="detenerEscaneo()">❌ CANCELAR</button>
     </div>
-
-    <div class="stats-bar">
-        <div class="stat-card"><span>Caja Turno</span><b id="dash-caja">$0</b></div>
-        <div class="stat-card"><span>En Stock</span><b id="dash-stock">0</b></div>
+    <div class="main-dash">
+        <div class="dash-item"><span>💰 CAJA TURNO</span><b id="dash-caja">$0</b></div>
+        <div class="dash-item"><span>📦 STOCK TOTAL</span><b id="dash-stock">0</b></div>
     </div>
-
-    <div class="btn-grid">
-        <button class="btn-main" style="background:var(--primary)" onclick="iniciarEscaneo('agregar')">📥 RECIBIR</button>
-        <button class="btn-main" style="background:var(--danger)" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
+    <div class="action-grid">
+        <button class="btn-big" style="background:var(--primary)" onclick="iniciarEscaneo('agregar')">📥 RECIBIR</button>
+        <button class="btn-big" style="background:var(--danger)" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
     </div>
+</div>
 
-    <div class="nav-bar">
-        <button class="nav-item" onclick="abrirPanel('panel-inventario')"><span>📦</span>STOCK</button>
-        <button class="nav-item" onclick="abrirPanel('panel-ventas')"><span>📋</span>VENTAS</button>
-        <button class="nav-item" onclick="abrirPanel('panel-pedidos')"><span>📝</span>PEDIDOS</button>
-        <button class="nav-item" onclick="abrirPanel('panel-finanzas')" style="color:var(--success)"><span>💵</span>DINERO</button>
+<div class="nav-menu">
+    <button class="btn-nav" onclick="abrirPanel('panel-stock')">📦<br>STOCK</button>
+    <button class="btn-nav" onclick="abrirPanel('panel-ventas')">📋<br>VENTAS</button>
+    <button class="btn-nav" onclick="abrirPanel('panel-pedidos')">📝<br>PEDIDOS</button>
+    <button class="btn-nav" onclick="abrirPanel('panel-dinero')" style="color:var(--success)">💵<br>DINERO</button>
+</div>
+
+<div id="panel-stock" class="view-panel">
+    <div class="panel-head"><h3>Inventario</h3><button class="btn-x" onclick="cerrarPanel('panel-stock')">CERRAR</button></div>
+    <div id="lista-inv"></div>
+</div>
+
+<div id="panel-ventas" class="view-panel">
+    <div class="panel-head"><h3>Ventas Turno</h3><button class="btn-x" onclick="cerrarPanel('panel-ventas')">CERRAR</button></div>
+    <div id="lista-ventas"></div>
+</div>
+
+<div id="panel-dinero" class="view-panel">
+    <div class="panel-head"><h3>Finanzas</h3><button class="btn-x" onclick="cerrarPanel('panel-dinero')">CERRAR</button></div>
+    <div style="background:black; color:gold; padding:20px; border-radius:20px; text-align:center; margin-bottom:15px;">
+        <span>👑 ACUMULADO GLOBAL</span>
+        <h2 id="fin-global" style="font-size:35px; margin:5px 0;">$0</h2>
     </div>
-
-    <div id="panel-inventario" class="panel">
-        <div class="panel-header"><h3>📦 Stock Juguetes</h3><button class="btn-close" onclick="cerrarPanel('panel-inventario')">X</button></div>
-        <input type="text" id="busc" placeholder="🔍 Buscar..." style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:15px;" onkeyup="filtrar()">
-        <div id="lista-inv"></div>
+    <div class="stats-grid">
+        <div class="stat-box"><span>GANANCIA TURNO</span><b id="fin-ganancia">$0</b></div>
+        <div class="stat-box"><span>INVERSIÓN STOCK</span><b id="fin-inversion">$0</b></div>
+        <div class="stat-box"><span>MÁS VENDIDO 🔥</span><b id="top-mas">---</b></div>
+        <div class="stat-box"><span>MENOS VENDIDO ❄️</span><b id="top-menos">---</b></div>
     </div>
+    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:15px; border:none; font-weight:bold;">🏁 FINALIZAR CORTE</button>
+    <h4 style="margin-top:20px;">Cortes Pasados</h4>
+    <div id="lista-cortes"></div>
+</div>
 
-    <div id="panel-finanzas" class="panel">
-        <div class="panel-header"><h3>💵 Finanzas</h3><button class="btn-close" onclick="cerrarPanel('panel-finanzas')">X</button></div>
-        <div style="background:var(--dark); color:gold; padding:20px; border-radius:15px; text-align:center;">
-            <small>ACUMULADO GLOBAL</small>
-            <h1 id="fin-global" style="margin:5px 0;">$0</h1>
-        </div>
-        <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:15px; border-radius:10px; border:none; font-weight:bold; margin:20px 0;">CERRAR TURNO</button>
-        <div id="lista-cortes"></div>
-    </div>
+<div id="panel-pedidos" class="view-panel">
+    <div class="panel-head"><h3>Pedidos</h3><button class="btn-x" onclick="cerrarPanel('panel-pedidos')">CERRAR</button></div>
+    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:15px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR FALTANTE</button>
+    <div id="lista-pedidos"></div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, update, remove, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, update, remove, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // CONFIGURACIÓN FIREBASE (Usa la tuya propia)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCI85dhteJ5Z4Wgb2A0pes0RI-KdaTAQlM",
-            authDomain: "miinventariojuguetes.firebaseapp.com",
-            databaseURL: "https://miinventariojuguetes-default-rtdb.firebaseio.com/",
-            projectId: "miinventariojuguetes",
-            storageBucket: "miinventariojuguetes.firebasestorage.app",
-            messagingSenderId: "872070944528",
-            appId: "1:872070944528:web:aeb9deab706b6de0dcb795"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyCI85dhteJ5Z4Wgb2A0pes0RI-KdaTAQlM",
+        authDomain: "miinventariojuguetes.firebaseapp.com",
+        databaseURL: "https://miinventariojuguetes-default-rtdb.firebaseio.com/",
+        projectId: "miinventariojuguetes",
+        storageBucket: "miinventariojuguetes.firebasestorage.app",
+        messagingSenderId: "872070944528",
+        appId: "1:872070944528:web:aeb9deab706b6de0dcb795"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const scanner = new Html5Qrcode("reader");
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const scanner = new Html5Qrcode("reader");
+    let cajaT = 0; let ganT = 0;
 
-        // Funciones básicas
-        window.abrirPanel = (id) => document.getElementById(id).style.display = 'block';
-        window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
+    window.abrirPanel = (id) => document.getElementById(id).style.display = 'block';
+    window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
 
-        window.iniciarEscaneo = (modo) => {
-            scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (codigo) => {
-                scanner.stop();
-                procesarVenta(codigo, modo);
-            });
-        };
-
-        async function procesarVenta(codigo, modo) {
-            // Aquí pones la lógica de Firebase que ya teníamos antes (set, update, etc.)
-            alert("Escaneado: " + codigo + " en modo: " + modo);
-        }
-
-        // Cargar Stock en tiempo real
-        onValue(ref(db, 'juguetes/'), (snap) => {
-            const list = document.getElementById('lista-inv');
-            let total = 0;
-            list.innerHTML = "";
-            snap.forEach(h => {
-                const p = h.val();
-                total += p.existencia;
-                list.innerHTML += `<div class="item-card"><b>${p.nombre}</b><span>${p.existencia} pz</span></div>`;
-            });
-            document.getElementById('dash-stock').innerText = total;
+    window.iniciarEscaneo = (modo) => {
+        document.getElementById('btn-cancelar').style.display = 'block';
+        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 200 }, (codigo) => {
+            detenerEscaneo();
+            procesar(codigo, modo);
         });
-    </script>
+    };
+
+    window.detenerEscaneo = () => {
+        scanner.stop().then(() => { document.getElementById('btn-cancelar').style.display = 'none'; }).catch(()=>{});
+    };
+
+    async function procesar(codigo, modo) {
+        const refP = ref(db, 'juguetes/' + codigo);
+        const snap = await get(refP);
+        if (modo === 'agregar') {
+            if (snap.exists()) {
+                const c = prompt(`Sumar stock a: ${snap.val().nombre}`, "1");
+                if (c) update(refP, { existencia: snap.val().existencia + parseInt(c) });
+            } else {
+                const n = prompt("Nombre:"); const co = prompt("Costo:"); const pr = prompt("Venta:"); const ex = prompt("Stock:", "1");
+                if (n) set(refP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) });
+            }
+        } else {
+            if (snap.exists()) {
+                const d = snap.val();
+                if (confirm(`Vender ${d.nombre} por $${d.precio}?`)) {
+                    const v = { nombre: d.nombre, precio: d.precio, costo: d.costo || 0, hora: new Date().toLocaleTimeString() };
+                    push(ref(db, 'ventas_actuales/'), v);
+                    if (d.existencia > 1) update(refP, { existencia: d.existencia - 1 });
+                    else remove(refP);
+                }
+            } else alert("No registrado");
+        }
+    }
+
+    onValue(ref(db, 'ventas_actuales/'), (snap) => {
+        cajaT = 0; ganT = 0; const list = document.getElementById('lista-ventas'); list.innerHTML = "";
+        snap.forEach(h => {
+            const v = h.val(); cajaT += v.precio; ganT += (v.precio - v.costo);
+            list.innerHTML = `<div class="card"><b>${v.nombre}</b><b>$${v.precio}</b></div>` + list.innerHTML;
+        });
+        document.getElementById('dash-caja').innerText = "$" + cajaT;
+        document.getElementById('fin-ganancia').innerText = "$" + ganT.toFixed(2);
+    });
+
+    onValue(ref(db, 'juguetes/'), (snap) => {
+        let st = 0; let inv = 0; const list = document.getElementById('lista-inv'); list.innerHTML = "";
+        snap.forEach(h => {
+            const p = h.val(); st += p.existencia; inv += (p.costo * p.existencia);
+            list.innerHTML += `<div class="card"><b>${p.nombre}</b><b>${p.existencia} pz</b></div>`;
+        });
+        document.getElementById('dash-stock').innerText = st;
+        document.getElementById('fin-inversion').innerText = "$" + inv.toFixed(2);
+    });
+
+    onValue(ref(db, 'historial_cortes/'), (snap) => {
+        let glob = 0; let cto = {}; const list = document.getElementById('lista-cortes'); list.innerHTML = "";
+        snap.forEach(h => {
+            const c = h.val(); glob += c.total_venta;
+            if(c.detalles) c.detalles.forEach(p => { cto[p.nombre] = (cto[p.nombre] || 0) + 1; });
+            list.innerHTML = `<div class="card"><span>${c.fecha}</span><b>$${c.total_venta}</b></div>` + list.innerHTML;
+        });
+        let m = {n:"---",v:0}, mn = {n:"---",v:Infinity};
+        for(let n in cto) {
+            if(cto[n]>m.v) m={n:n,v:cto[n]};
+            if(cto[n]<mn.v) mn={n:n,v:cto[n]};
+        }
+        document.getElementById('top-mas').innerText = m.n;
+        document.getElementById('top-menos').innerText = mn.n === '---' ? '---' : mn.n;
+        document.getElementById('fin-global').innerText = "$" + glob;
+    });
+
+    window.realizarCorte = async () => {
+        if (cajaT === 0) return alert("Caja vacía");
+        if (confirm(`¿Cerrar turno con $${cajaT}?`)) {
+            const vsnap = await get(ref(db, 'ventas_actuales/')); let vtas = [];
+            vsnap.forEach(x => vtas.push(x.val()));
+            await push(ref(db, 'historial_cortes/'), { total_venta: cajaT, total_ganancia: ganT, fecha: new Date().toLocaleString(), detalles: vtas });
+            await set(ref(db, 'ventas_actuales/'), null);
+            alert("Corte Guardado");
+        }
+    };
+
+    window.crearPedido = () => {
+        const p = prompt("Juguete faltante:");
+        if (p) push(ref(db, 'pedidos/'), { nombre: p, fecha: new Date().toLocaleDateString() });
+    };
+
+    onValue(ref(db, 'pedidos/'), (snap) => {
+        const list = document.getElementById('lista-pedidos'); list.innerHTML = "";
+        snap.forEach(h => { list.innerHTML = `<div class="card"><b>${h.val().nombre}</b></div>` + list.innerHTML; });
+    });
+</script>
 </body>
 </html>
