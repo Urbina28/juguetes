@@ -13,16 +13,27 @@
             --warning: #ff9f1c; --dark: #011627; --light: #f8f9fa; --white: #ffffff;
             --royal: #7209b7;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        /* ESTO EVITA QUE SE QUIERA COPIAR EL TEXTO AL DEJAR PRESIONADO */
         body { 
             font-family: -apple-system, sans-serif; background: var(--dark); 
             margin: 0; color: white; height: 100vh; overflow: hidden; position: fixed; width: 100%;
+            user-select: none; -webkit-user-select: none;
         }
 
         .app-container { height: 100vh; display: flex; flex-direction: column; padding: env(safe-area-inset-top) 15px 95px 15px; }
 
         .header { text-align: center; padding: 10px 0; }
-        .header span { font-size: 40px; display: block; cursor: pointer; }
+        
+        /* ESTILO ESPECIFICO PARA EL OSO */
+        #pánico { 
+            font-size: 40px; 
+            display: inline-block; 
+            cursor: pointer; 
+            -webkit-touch-callout: none; /* Bloquea el menú de copiar en iOS */
+        }
+        
         .header h2 { margin: 5px 0; font-size: 18px; letter-spacing: 2px; }
 
         #scanner-wrap { width: 100%; max-width: 280px; margin: 0 auto; }
@@ -49,16 +60,14 @@
         .btn-x { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; }
         
         .card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tab-btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: bold; background: #ddd; color: #666; font-size: 10px; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-size: 14px; outline: none; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-box { background: white; padding: 12px; border-radius: 15px; border: 1px solid #ddd; }
         .stat-box span { font-size: 9px; color: #888; display: block; }
         .stat-box b { font-size: 13px; color: var(--dark); }
-
-        .tab-btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: bold; background: #ddd; color: #666; font-size: 10px; }
-        .tab-btn.active { background: var(--primary); color: white; }
-        
-        .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-size: 14px; outline: none; }
     </style>
 </head>
 <body>
@@ -144,20 +153,37 @@
     const scanner = new Html5Qrcode("reader");
     let cajaT = 0; let ganT = 0;
 
-    // --- FUNCIÓN BORRADO TOTAL ---
+    // --- MEJORA DEL BOTÓN DE PÁNICO ---
     let timer;
     const osoLogo = document.getElementById('pánico');
-    osoLogo.addEventListener('touchstart', () => {
-        timer = setTimeout(() => {
-            const pass = prompt("🔑 CLAVE DE SEGURIDAD:");
-            if (pass === "GAEL2024") {
-                if (confirm("⚠️ ¿BORRAR TODA LA BASE DE DATOS?")) {
-                    set(ref(db, '/'), null).then(() => { alert("✅ Borrado total."); location.reload(); });
-                }
-            } else if (pass !== null) alert("❌ Incorrecta");
-        }, 3000); 
+
+    const triggerPanico = () => {
+        const pass = prompt("🔑 CLAVE DE SEGURIDAD:");
+        if (pass === "GAEL2024") {
+            if (confirm("⚠️ ¿BORRAR TODA LA BASE DE DATOS?")) {
+                set(ref(db, '/'), null).then(() => { 
+                    alert("✅ Base de datos borrada."); 
+                    location.reload(); 
+                });
+            }
+        } else if (pass !== null) {
+            alert("❌ Incorrecta");
+        }
+    };
+
+    // Soporte para móviles (Touch)
+    osoLogo.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Evita el menú de "copiar"
+        timer = setTimeout(triggerPanico, 3000);
     });
+
     osoLogo.addEventListener('touchend', () => clearTimeout(timer));
+
+    // Soporte para PC (Click largo)
+    osoLogo.addEventListener('mousedown', () => {
+        timer = setTimeout(triggerPanico, 3000);
+    });
+    osoLogo.addEventListener('mouseup', () => clearTimeout(timer));
 
     window.abrirPanel = (id) => {
         document.getElementById(id).style.display = 'block';
