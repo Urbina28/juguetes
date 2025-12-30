@@ -13,124 +13,155 @@
             --warning: #ff9f1c; --dark: #011627; --light: #f8f9fa; --white: #ffffff;
             --royal: #7209b7;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        /* ESTO EVITA QUE SE QUIERA COPIAR EL TEXTO AL DEJAR PRESIONADO */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { 
             font-family: -apple-system, sans-serif; background: var(--dark); 
-            margin: 0; color: white; height: 100vh; overflow: hidden; position: fixed; width: 100%;
-            user-select: none; -webkit-user-select: none;
+            color: white; height: 100vh; overflow: hidden; position: fixed; width: 100%;
         }
 
-        .app-container { height: 100vh; display: flex; flex-direction: column; padding: env(safe-area-inset-top) 15px 95px 15px; }
-
-        .header { text-align: center; padding: 10px 0; }
-        
-        /* ESTILO ESPECIFICO PARA EL OSO */
-        #pánico { 
-            font-size: 40px; 
-            display: inline-block; 
-            cursor: pointer; 
-            -webkit-touch-callout: none; /* Bloquea el menú de copiar en iOS */
+        /* LOGIN */
+        #login-screen {
+            position: fixed; top:0; left:0; width:100%; height:100%; background:var(--dark);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 5000;
         }
-        
-        .header h2 { margin: 5px 0; font-size: 18px; letter-spacing: 2px; }
+        .login-card { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; text-align: center; width: 85%; }
+        .login-input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: none; font-size: 24px; text-align: center; }
 
-        #scanner-wrap { width: 100%; max-width: 280px; margin: 0 auto; }
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); background: #000; aspect-ratio: 1/1; }
-        #btn-cancelar { display: none; width: 100%; background: var(--danger); border: none; color: white; padding: 12px; border-radius: 12px; margin-top: 8px; font-weight: bold; }
+        /* APP LAYOUT */
+        .app-container { height: 100vh; display: none; flex-direction: column; padding: env(safe-area-inset-top) 15px 95px 15px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+        #pánico { font-size: 30px; cursor: pointer; }
+        .btn-logout { background: rgba(255,255,255,0.1); border: none; color: #888; padding: 5px 10px; border-radius: 8px; font-size: 10px; }
 
-        .main-dash { background: rgba(255,255,255,0.07); border-radius: 20px; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .dash-item b { font-size: 20px; color: var(--success); display: block; }
+        /* SCANNER COMPACTO */
+        #scanner-wrap { width: 100%; max-width: 250px; margin: 0 auto 10px auto; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; aspect-ratio: 1.2/1; border: 2px solid #333; }
+        #btn-cancelar { display: none; width: 100%; background: var(--danger); border: none; color: white; padding: 10px; border-radius: 10px; margin-top: 5px; font-weight: bold; }
+
+        /* DASHBOARD ADMIN */
+        .main-dash { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .dash-item { background: rgba(255,255,255,0.07); padding: 12px; border-radius: 15px; text-align: center; }
+        .dash-item b { font-size: 18px; color: var(--success); display: block; }
         .dash-item span { font-size: 9px; color: #888; text-transform: uppercase; }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-big { padding: 18px; border: none; border-radius: 18px; font-size: 14px; font-weight: bold; color: white; }
-
-        .nav-menu { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; 
-            background: #1e293b; display: grid; grid-template-columns: repeat(4, 1fr); 
-            padding-bottom: env(safe-area-inset-bottom); z-index: 1000; border-top: 1px solid rgba(255,255,255,0.1); 
-        }
-        .btn-nav { background: transparent; border: none; color: #ccc; font-size: 11px; font-weight: bold; height: 100%; }
-        .btn-nav span { font-size: 24px; display: block; margin-bottom: 2px; }
-
-        .view-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light); color: var(--dark); z-index: 2000; padding: 25px; overflow-y: auto; padding-bottom: 110px; }
-        .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-x { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; }
+        /* BOTONES ACCIÓN */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .btn-big { padding: 18px 10px; border: none; border-radius: 15px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; }
         
-        .card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .tab-btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: bold; background: #ddd; color: #666; font-size: 10px; }
+        /* LISTA VENTAS RECIENTES */
+        #mini-ventas { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px; margin-bottom: 10px; }
+        .mini-item { padding: 8px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-size: 12px; }
+
+        /* NAVEGACIÓN */
+        .nav-menu { 
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; 
+            background: #1e293b; display: grid; grid-template-columns: repeat(4, 1fr); 
+            padding-bottom: env(safe-area-inset-bottom); z-index: 1000; border-top: 1px solid #333;
+        }
+        .btn-nav { background: transparent; border: none; color: #ccc; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-nav span { font-size: 22px; margin-bottom: 2px; }
+
+        /* PANELES */
+        .view-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light); color: var(--dark); z-index: 2000; padding: 20px; overflow-y: auto; padding-bottom: 100px; }
+        .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .btn-x { background: var(--dark); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; }
+        .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .search-box { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-size: 16px; outline: none; }
+        
+        /* TABS VENTAS */
+        .tab-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #ddd; color: #666; font-weight: bold; }
         .tab-btn.active { background: var(--primary); color: white; }
-        .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-size: 14px; outline: none; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: white; padding: 12px; border-radius: 15px; border: 1px solid #ddd; }
-        .stat-box span { font-size: 9px; color: #888; display: block; }
-        .stat-box b { font-size: 13px; color: var(--dark); }
+
+        /* FINANZAS */
+        .fin-card { background: var(--dark); color: gold; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; }
+        .fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .fin-box { background: white; padding: 15px; border-radius: 15px; border: 1px solid #ddd; }
+        .fin-box span { font-size: 10px; color: #888; display: block; }
+        .fin-box b { font-size: 15px; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header"><span id="pánico">🧸</span><h2>MUNDO DE SONRISAS</h2></div>
-    <div id="scanner-wrap">
-        <div id="reader"></div>
-        <button id="btn-cancelar" onclick="detenerEscaneo()">❌ CANCELAR</button>
-    </div>
-    <div class="main-dash">
-        <div class="dash-item"><span>💰 CAJA TURNO</span><b id="dash-caja">$0</b></div>
-        <div class="dash-item"><span>📦 STOCK TOTAL</span><b id="dash-stock">0</b></div>
-    </div>
-    <div class="action-grid">
-        <button class="btn-big" style="background:var(--primary)" onclick="iniciarEscaneo('agregar')">📥 AGREGAR</button>
-        <button class="btn-big" style="background:var(--danger)" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
+<div id="login-screen">
+    <div class="login-card">
+        <h1 style="font-size: 50px;">🧸</h1>
+        <h2 style="margin-bottom: 20px;">GAEL TOYS LOGIN</h2>
+        <input type="password" id="n-pass" class="login-input" placeholder="CÓDIGO PIN" inputmode="numeric">
+        <button onclick="login()" style="width:100%; padding:18px; border-radius:15px; background:var(--success); color:white; border:none; font-weight:bold; font-size: 18px;">ENTRAR</button>
     </div>
 </div>
 
-<div class="nav-menu">
+<div class="app-container" id="app-body">
+    <div class="header">
+        <span id="pánico" onclick="contarToques()">🧸</span>
+        <h3 id="user-title" style="font-size: 12px; letter-spacing: 1px;">SISTEMA GAEL TOYS</h3>
+        <button class="btn-logout" onclick="logout()">CERRAR SESIÓN</button>
+    </div>
+    
+    <div id="scanner-wrap">
+        <div id="reader"></div>
+        <button id="btn-cancelar" onclick="detenerEscaneo()">❌ CANCELAR ESCANEO</button>
+    </div>
+
+    <div class="main-dash" id="dash-admin">
+        <div class="dash-item"><span>💰 CAJA TURNO</span><b id="dash-caja">$0</b></div>
+        <div class="dash-item"><span>📦 STOCK TOTAL</span><b id="dash-stock">0</b></div>
+    </div>
+
+    <div class="action-grid">
+        <button id="btn-recibir" class="btn-big" style="background:var(--primary)" onclick="iniciarEscaneo('agregar')">📥 RECIBIR</button>
+        <button id="btn-vender" class="btn-big" style="background:var(--danger)" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
+        <button id="btn-ver-vendedor" class="btn-big" style="background:var(--royal); display:none; grid-column: span 2;" onclick="abrirPanel('panel-stock')">🔍 BUSCAR JUGUETE / STOCK</button>
+    </div>
+
+    <div id="mini-ventas">
+        <h4 style="color:#888; font-size:10px; margin-bottom:8px; letter-spacing: 1px;">ÚLTIMOS MOVIMIENTOS</h4>
+        <div id="lista-mini-ventas"></div>
+    </div>
+</div>
+
+<div class="nav-menu" id="menu-inferior">
     <button class="btn-nav" onclick="abrirPanel('panel-stock')"><span>📦</span>STOCK</button>
     <button class="btn-nav" onclick="abrirPanel('panel-ventas')"><span>📋</span>VENTAS</button>
     <button class="btn-nav" onclick="abrirPanel('panel-pedidos')"><span>📝</span>PEDIDOS</button>
     <button class="btn-nav" onclick="abrirPanel('panel-dinero')" style="color:var(--success)"><span>💵</span>DINERO</button>
 </div>
 
-<div id="panel-ventas" class="view-panel">
-    <div class="panel-head"><h3>📋 Ventas</h3><button class="btn-x" onclick="cerrarPanel('panel-ventas')">X</button></div>
-    <input type="text" id="busc-ventas" class="search-box" placeholder="🔍 Buscar juguete vendido..." onkeyup="filtrarVentas()">
-    <div class="tab-btn-group">
-        <button id="btn-tab-turno" class="tab-btn active" onclick="verVentas('turno')">VENTAS CORTE</button>
-        <button id="btn-tab-total" class="tab-btn" onclick="verVentas('total')">VENTAS TOTALES</button>
-    </div>
-    <div id="contenedor-ventas"></div>
+<div id="panel-stock" class="view-panel">
+    <div class="panel-head"><h3 id="tit-stock">📦 Inventario</h3><button class="btn-x" onclick="cerrarPanel('panel-stock')">X</button></div>
+    <input type="text" id="busc-stock" class="search-box" placeholder="Buscar juguete..." onkeyup="filtrarStock()">
+    <div id="lista-inv"></div>
 </div>
 
-<div id="panel-stock" class="view-panel">
-    <div class="panel-head"><h3>📦 Inventario</h3><button class="btn-x" onclick="cerrarPanel('panel-stock')">X</button></div>
-    <input type="text" id="busc-stock" class="search-box" placeholder="🔍 Buscar en inventario..." onkeyup="filtrarStock()">
-    <div id="lista-inv"></div>
+<div id="panel-ventas" class="view-panel">
+    <div class="panel-head"><h3>📋 Ventas</h3><button class="btn-x" onclick="cerrarPanel('panel-ventas')">X</button></div>
+    <div class="tab-group">
+        <button id="tab-corte" class="tab-btn active" onclick="verVentas('turno')">DEL CORTE</button>
+        <button id="tab-total" class="tab-btn" onclick="verVentas('total')">HISTORIAL</button>
+    </div>
+    <input type="text" id="busc-ventas" class="search-box" placeholder="Filtrar por nombre..." onkeyup="filtrarVentas()">
+    <div id="contenedor-ventas"></div>
 </div>
 
 <div id="panel-dinero" class="view-panel">
     <div class="panel-head"><h3>💵 Finanzas</h3><button class="btn-x" onclick="cerrarPanel('panel-dinero')">X</button></div>
-    <div style="background:black; color:gold; padding:20px; border-radius:20px; text-align:center; margin-bottom:15px;">
-        <span>👑 ACUMULADO GLOBAL</span>
-        <h2 id="fin-global" style="font-size:35px; margin:5px 0;">$0</h2>
+    <div class="fin-card">
+        <span>💰 ACUMULADO GLOBAL</span>
+        <h2 id="fin-global" style="font-size:40px; margin-top:5px;">$0</h2>
     </div>
-    <div class="stats-grid">
-        <div class="stat-box"><span>GANANCIA TURNO</span><b id="fin-ganancia">$0</b></div>
-        <div class="stat-box"><span>INVERSIÓN STOCK</span><b id="fin-inversion">$0</b></div>
-        <div class="stat-box"><span>MÁS VENDIDO 🔥</span><b id="top-mas">---</b></div>
-        <div class="stat-box"><span>MENOS VENDIDO ❄️</span><b id="top-menos">---</b></div>
+    <div class="fin-grid">
+        <div class="fin-box"><span>GANANCIA CORTE</span><b id="fin-ganancia" style="color:var(--success)">$0</b></div>
+        <div class="fin-box"><span>INVERSIÓN STOCK</span><b id="fin-inversion">$0</b></div>
     </div>
-    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:15px; border:none; font-weight:bold;">🏁 FINALIZAR CORTE</button>
-    <h4 style="margin-top:20px;">Cortes Pasados</h4>
+    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:15px; border:none; font-weight:bold; font-size:16px;">🏁 CERRAR CAJA / CORTE</button>
+    <h4 style="margin: 20px 0 10px 0; color: #888;">Cortes Guardados:</h4>
     <div id="lista-cortes"></div>
 </div>
 
 <div id="panel-pedidos" class="view-panel">
     <div class="panel-head"><h3>📝 Pedidos</h3><button class="btn-x" onclick="cerrarPanel('panel-pedidos')">X</button></div>
-    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:15px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR FALTANTE</button>
+    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:12px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR FALTANTE</button>
     <div id="lista-pedidos"></div>
 </div>
 
@@ -151,127 +182,79 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const scanner = new Html5Qrcode("reader");
-    let cajaT = 0; let ganT = 0;
+    let cajaT = 0; let ganT = 0; let MiRol = ""; 
 
-    // --- MEJORA DEL BOTÓN DE PÁNICO ---
-    let timer;
-    const osoLogo = document.getElementById('pánico');
-
-    const triggerPanico = () => {
-        const pass = prompt("🔑 CLAVE DE SEGURIDAD:");
-        if (pass === "GAEL2024") {
-            if (confirm("⚠️ ¿BORRAR TODA LA BASE DE DATOS?")) {
-                set(ref(db, '/'), null).then(() => { 
-                    alert("✅ Base de datos borrada."); 
-                    location.reload(); 
-                });
-            }
-        } else if (pass !== null) {
-            alert("❌ Incorrecta");
-        }
+    window.onload = () => {
+        const r = localStorage.getItem('gael_rol');
+        if(r) { MiRol = r; setupApp(); } else { document.getElementById('login-screen').style.display = 'flex'; }
     };
 
-    // Soporte para móviles (Touch)
-    osoLogo.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Evita el menú de "copiar"
-        timer = setTimeout(triggerPanico, 3000);
-    });
+    window.login = () => {
+        const p = document.getElementById('n-pass').value;
+        if(p === "2005") { MiRol = "admin"; localStorage.setItem('gael_rol', 'admin'); setupApp(); }
+        else if(p === "0000") { MiRol = "vendedor"; localStorage.setItem('gael_rol', 'vendedor'); setupApp(); }
+        else { alert("PIN Incorrecto"); }
+    };
 
-    osoLogo.addEventListener('touchend', () => clearTimeout(timer));
+    window.logout = () => { if(confirm("¿Cerrar sesión?")) { localStorage.removeItem('gael_rol'); location.reload(); } };
 
-    // Soporte para PC (Click largo)
-    osoLogo.addEventListener('mousedown', () => {
-        timer = setTimeout(triggerPanico, 3000);
-    });
-    osoLogo.addEventListener('mouseup', () => clearTimeout(timer));
+    function setupApp() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-body').style.display = 'flex';
+        if(MiRol === "vendedor") {
+            document.getElementById('menu-inferior').style.display = 'none';
+            document.getElementById('dash-admin').style.display = 'none';
+            document.getElementById('btn-recibir').style.display = 'none';
+            document.getElementById('btn-ver-vendedor').style.display = 'block';
+            document.getElementById('pánico').style.pointerEvents = 'none';
+            document.getElementById('btn-vender').style.gridColumn = 'span 2';
+            document.getElementById('btn-vender').style.height = '150px';
+            document.getElementById('user-title').innerText = "VENDEDOR";
+        }
+    }
 
-    window.abrirPanel = (id) => {
-        document.getElementById(id).style.display = 'block';
-        if(id === 'panel-ventas') verVentas('turno');
+    window.abrirPanel = (id) => { 
+        document.getElementById(id).style.display = 'block'; 
+        if(id === 'panel-ventas') verVentas('turno'); 
     };
     window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
 
-    window.verVentas = (tipo) => {
-        const btnTurno = document.getElementById('btn-tab-turno');
-        const btnTotal = document.getElementById('btn-tab-total');
-        const contenedor = document.getElementById('contenedor-ventas');
-        document.getElementById('busc-ventas').value = ""; 
-
-        if(tipo === 'turno') {
-            btnTurno.classList.add('active'); btnTotal.classList.remove('active');
-            onValue(ref(db, 'ventas_actuales/'), (snap) => {
-                contenedor.innerHTML = "";
-                snap.forEach(h => {
-                    const v = h.val();
-                    contenedor.innerHTML = `<div class="card sale-item"><b>${v.nombre}</b><b>$${v.precio}</b></div>` + contenedor.innerHTML;
-                });
-            }, { onlyOnce: true });
-        } else {
-            btnTotal.classList.add('active'); btnTurno.classList.remove('active');
-            onValue(ref(db, 'ventas_generales/'), (snap) => {
-                contenedor.innerHTML = "";
-                snap.forEach(h => {
-                    const v = h.val();
-                    contenedor.innerHTML = `<div class="card sale-item" style="font-size:11px;"><div><b>${v.nombre}</b><br>${v.fecha}</div><b>$${v.precio}</b></div>` + contenedor.innerHTML;
-                });
-            }, { onlyOnce: true });
-        }
-    };
-
-    window.filtrarVentas = () => {
-        const q = document.getElementById('busc-ventas').value.toLowerCase();
-        document.querySelectorAll('.sale-item').forEach(c => {
-            c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
-        });
-    };
-
-    window.filtrarStock = () => {
-        const q = document.getElementById('busc-stock').value.toLowerCase();
-        document.querySelectorAll('#lista-inv .card').forEach(c => {
-            c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
-        });
-    };
-
     window.iniciarEscaneo = (modo) => {
         document.getElementById('btn-cancelar').style.display = 'block';
-        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 200 }, (codigo) => {
-            detenerEscaneo();
-            procesar(codigo, modo);
-        });
+        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 220 }, (c) => { detenerEscaneo(); procesar(c, modo); });
     };
 
-    window.detenerEscaneo = () => {
-        scanner.stop().then(() => { document.getElementById('btn-cancelar').style.display = 'none'; }).catch(()=>{});
-    };
+    window.detenerEscaneo = () => { scanner.stop().then(() => document.getElementById('btn-cancelar').style.display = 'none').catch(()=>{}); };
 
-    async function procesar(codigo, modo) {
-        const refP = ref(db, 'juguetes/' + codigo);
-        const snap = await get(refP);
-        if (modo === 'agregar') {
-            if (snap.exists()) {
-                const c = prompt(`Sumar stock a: ${snap.val().nombre}`, "1");
-                if (c) update(refP, { existencia: snap.val().existencia + parseInt(c) });
+    async function procesar(cod, modo) {
+        const rP = ref(db, 'juguetes/' + cod);
+        const snap = await get(rP);
+        if(modo === 'agregar') {
+            if(snap.exists()) {
+                const q = prompt(`Sumar stock a ${snap.val().nombre}`, "1");
+                if(q) update(rP, { existencia: snap.val().existencia + parseInt(q) });
             } else {
                 const n = prompt("Nombre:"); const co = prompt("Costo:"); const pr = prompt("Venta:"); const ex = prompt("Stock:", "1");
-                if (n) set(refP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) });
+                if(n) set(rP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) });
             }
         } else {
-            if (snap.exists()) {
+            if(snap.exists()) {
                 const d = snap.val();
-                if (confirm(`Vender ${d.nombre} por $${d.precio}?`)) {
+                if(confirm(`Vender ${d.nombre} por $${d.precio}?`)) {
                     const v = { nombre: d.nombre, precio: d.precio, costo: d.costo || 0, hora: new Date().toLocaleTimeString(), fecha: new Date().toLocaleDateString() };
-                    push(ref(db, 'ventas_actuales/'), v);
-                    push(ref(db, 'ventas_generales/'), v);
-                    if (d.existencia > 1) update(refP, { existencia: d.existencia - 1 });
-                    else remove(refP);
+                    push(ref(db, 'ventas_actuales/'), v); push(ref(db, 'ventas_generales/'), v);
+                    if(d.existencia > 1) update(rP, { existencia: d.existencia - 1 }); else remove(rP);
                 }
-            } else alert("No registrado");
+            } else alert("No registrado.");
         }
     }
 
     onValue(ref(db, 'ventas_actuales/'), (snap) => {
-        cajaT = 0; ganT = 0;
-        snap.forEach(h => { const v = h.val(); cajaT += v.precio; ganT += (v.precio - v.costo); });
+        cajaT = 0; ganT = 0; const list = document.getElementById('lista-mini-ventas'); list.innerHTML = "";
+        snap.forEach(h => {
+            const v = h.val(); cajaT += v.precio; ganT += (v.precio - v.costo);
+            list.innerHTML = `<div class="mini-item"><span>${v.nombre}</span><b>$${v.precio}</b></div>` + list.innerHTML;
+        });
         document.getElementById('dash-caja').innerText = "$" + cajaT;
         document.getElementById('fin-ganancia').innerText = "$" + ganT.toFixed(2);
     });
@@ -280,49 +263,68 @@
         let st = 0; let inv = 0; const list = document.getElementById('lista-inv'); list.innerHTML = "";
         snap.forEach(h => {
             const p = h.val(); st += p.existencia; inv += (p.costo * p.existencia);
-            list.innerHTML += `<div class="card"><b>${p.nombre}</b><b>${p.existencia} pz</b></div>`;
+            list.innerHTML += `<div class="card"><b>${p.nombre}</b><span>${p.existencia} pz</span></div>`;
         });
         document.getElementById('dash-stock').innerText = st;
         document.getElementById('fin-inversion').innerText = "$" + inv.toFixed(2);
     });
 
+    window.verVentas = (tipo) => {
+        document.getElementById('tab-corte').classList.toggle('active', tipo==='turno');
+        document.getElementById('tab-total').classList.toggle('active', tipo!=='turno');
+        onValue(ref(db, tipo === 'turno' ? 'ventas_actuales/' : 'ventas_generales/'), (snap) => {
+            const cont = document.getElementById('contenedor-ventas'); cont.innerHTML = "";
+            snap.forEach(h => {
+                const v = h.val();
+                cont.innerHTML = `<div class="card sale-item"><div><b>${v.nombre}</b><br><small>${v.fecha}</small></div><b>$${v.precio}</b></div>` + cont.innerHTML;
+            });
+        }, { onlyOnce: true });
+    };
+
     onValue(ref(db, 'historial_cortes/'), (snap) => {
-        let glob = 0; let cto = {}; const list = document.getElementById('lista-cortes'); list.innerHTML = "";
-        snap.forEach(h => {
-            const c = h.val(); glob += c.total_venta;
-            if(c.detalles) c.detalles.forEach(p => { cto[p.nombre] = (cto[p.nombre] || 0) + 1; });
-            list.innerHTML = `<div class="card"><span>${c.fecha}</span><b>$${c.total_venta}</b></div>` + list.innerHTML;
-        });
-        let m = {n:"---",v:0}, mn = {n:"---",v:Infinity};
-        for(let n in cto) {
-            if(cto[n]>m.v) m={n:n,v:cto[n]};
-            if(cto[n]<mn.v) mn={n:n,v:cto[n]};
-        }
-        document.getElementById('top-mas').innerText = m.n;
-        document.getElementById('top-menos').innerText = mn.n === '---' ? '---' : mn.n;
+        let glob = 0; const list = document.getElementById('lista-cortes'); list.innerHTML = "";
+        snap.forEach(h => { glob += h.val().total_venta; list.innerHTML = `<div class="card"><span>${h.val().fecha}</span><b>$${h.val().total_venta}</b></div>` + list.innerHTML; });
         document.getElementById('fin-global').innerText = "$" + glob;
     });
 
     window.realizarCorte = async () => {
-        if (cajaT === 0) return alert("Caja vacía");
-        if (confirm(`¿Cerrar turno con $${cajaT}?`)) {
+        if(cajaT === 0) return alert("Caja vacía");
+        if(confirm(`Cerrar caja con $${cajaT}?`)) {
             const vsnap = await get(ref(db, 'ventas_actuales/')); let vtas = [];
             vsnap.forEach(x => vtas.push(x.val()));
             await push(ref(db, 'historial_cortes/'), { total_venta: cajaT, total_ganancia: ganT, fecha: new Date().toLocaleString(), detalles: vtas });
-            await set(ref(db, 'ventas_actuales/'), null);
-            alert("Corte Guardado");
+            await set(ref(db, 'ventas_actuales/'), null); alert("Corte guardado.");
         }
     };
 
-    window.crearPedido = () => {
-        const p = prompt("Juguete faltante:");
-        if (p) push(ref(db, 'pedidos/'), { nombre: p, fecha: new Date().toLocaleDateString() });
+    window.filtrarStock = () => {
+        const q = document.getElementById('busc-stock').value.toLowerCase();
+        document.querySelectorAll('#lista-inv .card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none');
     };
 
+    window.filtrarVentas = () => {
+        const q = document.getElementById('busc-ventas').value.toLowerCase();
+        document.querySelectorAll('.sale-item').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none');
+    };
+
+    window.crearPedido = () => { const p = prompt("Juguete faltante:"); if(p) push(ref(db, 'pedidos/'), { nombre: p }); };
     onValue(ref(db, 'pedidos/'), (snap) => {
         const list = document.getElementById('lista-pedidos'); list.innerHTML = "";
-        snap.forEach(h => { list.innerHTML = `<div class="card"><b>${h.val().nombre}</b></div>` + list.innerHTML; });
+        snap.forEach(h => { list.innerHTML = `<div class="card">${h.val().nombre}</div>` + list.innerHTML; });
     });
+
+    let toques = 0; let tiempoT;
+    window.contarToques = () => {
+        if(MiRol !== "admin") return;
+        toques++; clearTimeout(tiempoT);
+        if (toques === 5) {
+            toques = 0;
+            if (prompt("CLAVE SEGURIDAD:") === "GAEL2024") {
+                if (confirm("¿BORRAR TODO?")) { set(ref(db, '/'), null).then(() => location.reload()); }
+            }
+        }
+        tiempoT = setTimeout(() => { toques = 0; }, 2000);
+    };
 </script>
 </body>
 </html>
