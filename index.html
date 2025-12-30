@@ -2,85 +2,156 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juguetería Gael - Punto de Venta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Gael Toys POS</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gael Toys">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3082/3082060.png">
+    <meta name="theme-color" content="#011627">
+
     <script src="https://unpkg.com/html5-qrcode"></script>
+    
     <style>
         :root {
             --primary: #4361ee; --success: #2ec4b6; --danger: #e71d36;
-            --warning: #ff9f1c; --dark: #011627; --light: #f1f2f6; --gray: #888;
+            --warning: #ff9f1c; --dark: #011627; --light: #f8f9fa; --white: #ffffff;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 10px; color: var(--dark); }
-        .app-container { max-width: 480px; margin: auto; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 20px; }
-        
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; margin-bottom: 15px; }
-        
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        button { padding: 15px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; }
-        .btn-add { background: var(--primary); }
-        .btn-sell { background: var(--danger); }
-        
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr; background: var(--dark); color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; gap: 10px; }
-        .dash-item span { display: block; font-size: 10px; color: var(--gray); text-transform: uppercase; }
-        .dash-item b { font-size: 16px; color: var(--success); }
-        
-        .cash-box { grid-column: span 2; border-top: 1px solid #333; pt: 10px; margin-top: 5px; text-align: center; }
-        .cash-box b { font-size: 22px; color: var(--success); }
 
-        .search-bar { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
-
-        .product-card {
-            background: white; border: 1px solid #eee; padding: 12px; border-radius: 15px;
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-            border-left: 5px solid var(--primary);
+        * { 
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent; 
+            box-sizing: border-box;
         }
         
-        /* Alerta de Stock Bajo */
-        .qty-badge { padding: 6px 12px; border-radius: 12px; font-weight: bold; font-size: 14px; margin-right: 12px; color: white; }
+        body { 
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto;
+            background: var(--dark); margin: 0; color: var(--white); 
+            height: 100vh; overflow: hidden;
+        }
+        
+        .app-container { 
+            height: 100vh; display: flex; flex-direction: column; 
+            padding: 20px; padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            justify-content: space-between;
+        }
+
+        h2 { text-align: center; font-weight: 300; letter-spacing: 3px; margin: 10px 0; }
+
+        /* Lector de Cámara */
+        #reader { 
+            width: 100%; border-radius: 30px; overflow: hidden; 
+            background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        /* Dashboard de Dinero y Stock */
+        .main-dash { 
+            background: rgba(255,255,255,0.07); border-radius: 25px; 
+            padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
+        }
+        .dash-item { text-align: center; }
+        .dash-item span { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .dash-item b { font-size: 22px; color: var(--success); }
+
+        /* Botones de Acción */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-big { 
+            padding: 25px 10px; border: none; border-radius: 22px; 
+            font-size: 16px; font-weight: bold; color: white;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+        }
+        .btn-recibir { background: var(--primary); }
+        .btn-vender { background: var(--danger); }
+
+        /* Navegación Inferior */
+        .nav-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-nav { 
+            background: #1e293b; padding: 18px; border-radius: 18px; 
+            border: 1px solid #334155; color: white; font-size: 13px; font-weight: 600;
+        }
+
+        /* Paneles Deslizantes (Vistas) */
+        .view-panel {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--light); color: var(--dark); z-index: 100; 
+            padding: 25px; overflow-y: auto; animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-cerrar { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; }
+
+        /* Buscador */
+        .search-bar { 
+            width: 100%; padding: 15px; border-radius: 15px; 
+            border: 2px solid #ddd; margin-bottom: 20px; font-size: 16px; outline: none;
+        }
+
+        /* Tarjetas de Juguetes y Ventas */
+        .card { 
+            background: white; border-radius: 20px; padding: 15px; 
+            margin-bottom: 12px; display: flex; justify-content: space-between; 
+            align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        }
+        .qty-circle { 
+            width: 40px; height: 40px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: white; font-size: 14px;
+        }
         .stock-ok { background: var(--primary); }
-        .stock-low { background: var(--warning); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .stock-low { background: var(--warning); animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .product-info { flex-grow: 1; }
-        .product-info b { font-size: 15px; display: block; }
-        .product-info small { color: var(--gray); font-size: 11px; }
-        
-        .price-section { text-align: right; }
-        .price-tag { color: var(--primary); font-weight: bold; font-size: 15px; display: block; }
-        .edit-btn { background: none; color: var(--primary); border: none; font-size: 11px; text-decoration: underline; padding: 0; cursor: pointer; margin-top: 5px; }
-        
-        .btn-reset { margin-top: 30px; background: none; color: var(--gray); font-size: 11px; width: 100%; text-decoration: underline; border: none; cursor: pointer; }
+        .info-txt b { font-size: 15px; display: block; color: var(--dark); }
+        .info-txt small { color: var(--gray); font-size: 11px; }
+
+        .price-txt { font-weight: bold; color: var(--primary); font-size: 16px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h2 style="text-align: center;">🧸 MUNDO DE SONRISAS  🧸</h2>
+    <h2>GAEL TOYS 🧸</h2>
+
     <div id="reader"></div>
-    <div id="status" style="text-align:center; margin-bottom:10px; font-weight:bold; color:var(--primary);">Sistema Listo</div>
+    <div id="status" style="text-align: center; font-size: 12px; color: var(--success); margin: 5px 0;">SISTEMA ACTIVO</div>
 
-    <div class="btn-group">
-        <button class="btn-add" onclick="iniciarEscaneo('agregar')">📥 Agregar</button>
-        <button class="btn-sell" onclick="iniciarEscaneo('vender')">💰 Vender</button>
+    <div class="main-dash">
+        <div class="dash-item"><span>💰 EN CAJA</span><b id="dash-caja">$0</b></div>
+        <div class="dash-item"><span>📦 STOCK</span><b id="dash-stock">0</b></div>
     </div>
 
-    <div class="dashboard">
-        <div class="dash-item"><span>Stock Total</span><b id="count-stock">0</b></div>
-        <div class="dash-item"><span>Ventas Hoy</span><b id="count-sales">0</b></div>
-        <div class="dash-item cash-box">
-            <span>💸 Dinero en Caja (Hoy)</span>
-            <b id="cash-total">$0</b>
-        </div>
+    <div class="action-grid">
+        <button class="btn-big btn-recibir" onclick="iniciarEscaneo('agregar')">📥 RECIBIR</button>
+        <button class="btn-big btn-vender" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
     </div>
 
-    <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar por nombre..." onkeyup="filtrarLista()">
-
-    <div class="inventory-list">
-        <h3>Inventario</h3>
-        <div id="lista-html"></div>
+    <div class="nav-menu">
+        <button class="btn-nav" onclick="abrirPanel('panel-inventario')">📦 INVENTARIO</button>
+        <button class="btn-nav" onclick="abrirPanel('panel-ventas')">📋 VENTAS</button>
     </div>
 
-    <button class="btn-reset" onclick="reinicioMaestro()">⚙️ Reiniciar Base de Datos</button>
+    <button onclick="reinicioMaestro()" style="background:none; border:none; color:#334155; font-size:10px; width:100%;">REINICIAR BASE DE DATOS</button>
+</div>
+
+<div id="panel-inventario" class="view-panel">
+    <div class="header-panel">
+        <h3 style="margin:0">📦 Inventario</h3>
+        <button class="btn-cerrar" onclick="cerrarPanel('panel-inventario')">VOLVER</button>
+    </div>
+    <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar juguete..." onkeyup="filtrarLista()">
+    <div id="lista-inventario"></div>
+</div>
+
+<div id="panel-ventas" class="view-panel">
+    <div class="header-panel">
+        <h3 style="margin:0">📋 Ventas de Hoy</h3>
+        <button class="btn-cerrar" onclick="cerrarPanel('panel-ventas')">VOLVER</button>
+    </div>
+    <div id="lista-ventas"></div>
 </div>
 
 <script type="module">
@@ -101,134 +172,99 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const scanner = new Html5Qrcode("reader");
-    let modo = "";
 
-    window.iniciarEscaneo = (accion) => {
-        modo = accion;
-        document.getElementById('status').innerText = "📷 Escaneando...";
-        scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (codigo) => {
+    window.abrirPanel = (id) => document.getElementById(id).style.display = 'block';
+    window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
+
+    window.iniciarEscaneo = (modo) => {
+        document.getElementById('status').innerText = "📷 BUSCANDO CÓDIGO...";
+        scanner.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, (codigo) => {
             scanner.stop();
-            procesarCodigo(codigo);
-        }).catch(err => alert("Error de cámara: " + err));
+            procesar(codigo, modo);
+        });
     };
 
-    async function procesarCodigo(codigo) {
-        const itemRef = ref(db, 'juguetes/' + codigo);
-        const snapshot = await get(itemRef);
+    async function procesar(codigo, modo) {
+        const refProd = ref(db, 'juguetes/' + codigo);
+        const snap = await get(refProd);
 
         if (modo === 'agregar') {
-            if (snapshot.exists()) {
-                const actual = snapshot.val();
-                const cantidadNueva = prompt(`¿Cuántas piezas de "${actual.nombre}" vas a SUMAR?`, "1");
-                if (cantidadNueva) {
-                    const totalExistencia = (parseInt(actual.existencia) || 0) + parseInt(cantidadNueva);
-                    update(itemRef, { existencia: totalExistencia });
-                }
+            if (snap.exists()) {
+                const actual = snap.val();
+                const cant = prompt(`Sumar a "${actual.nombre}":`, "1");
+                if (cant) update(refProd, { existencia: (parseInt(actual.existencia) || 0) + parseInt(cant) });
             } else {
-                const nombre = prompt("Nombre del nuevo juguete:");
-                const costo = prompt("Precio de costo (inversión):", "0");
-                const precio = prompt("Precio de venta:", "0");
-                const existencia = prompt("¿Cuántas piezas entran?", "1");
-                if (nombre) {
-                    set(itemRef, {
-                        nombre, id: codigo, costo: parseFloat(costo) || 0, precio: parseFloat(precio) || 0, 
-                        existencia: parseInt(existencia) || 0, fechaRegistro: new Date().toLocaleString()
-                    });
-                }
+                const nombre = prompt("Nombre del juguete:");
+                const precio = prompt("Precio de venta:");
+                const cant = prompt("¿Cuántos recibes?", "1");
+                if (nombre) set(refProd, { 
+                    nombre, precio: parseFloat(precio) || 0, existencia: parseInt(cant) || 1, id: codigo 
+                });
             }
-        } else if (modo === 'vender') {
-            if (snapshot.exists()) {
-                const d = snapshot.val();
-                const stockActual = parseInt(d.existencia) || 0;
-                if(confirm(`¿Vender 1 unidad de ${d.nombre}?`)) {
-                    // Registro detallado de venta
+        } else {
+            if (snap.exists()) {
+                const d = snap.val();
+                if (confirm(`¿Vender ${d.nombre}?`)) {
                     push(ref(db, 'ventas/'), { 
-                        nombre: d.nombre, 
-                        precio: d.precio, 
-                        costo: d.costo,
-                        fechaVenta: new Date().toLocaleString(),
-                        id: d.id
+                        nombre: d.nombre, precio: d.precio, hora: new Date().toLocaleTimeString() 
                     });
-                    
-                    if (stockActual > 1) {
-                        update(itemRef, { existencia: stockActual - 1 });
-                    } else {
-                        remove(itemRef);
-                    }
-                    document.getElementById('status').innerText = "💰 ¡Venta Exitosa!";
+                    if (d.existencia > 1) update(refProd, { existencia: d.existencia - 1 });
+                    else remove(refProd);
                 }
-            } else { alert("Error: El producto no existe en el inventario."); }
+            } else alert("No está en el sistema.");
         }
+        document.getElementById('status').innerText = "SISTEMA ACTIVO";
     }
 
-    window.editarItem = (id, nombre, precio, costo, existencia) => {
-        const nPrecio = prompt(`Nuevo precio para ${nombre}:`, precio);
-        const nExistencia = prompt(`Nueva cantidad para ${nombre}:`, existencia);
-        if (nPrecio !== null && nExistencia !== null) {
-            update(ref(db, 'juguetes/' + id), { 
-                precio: parseFloat(nPrecio) || 0, 
-                existencia: parseInt(nExistencia) || 0 
-            });
-        }
-    };
-
-    // Actualización de Inventario y Alertas
-    onValue(ref(db, 'juguetes/'), (snapshot) => {
-        const contenedor = document.getElementById('lista-html');
-        contenedor.innerHTML = "";
-        let totalPiezas = 0;
-
-        snapshot.forEach((hijo) => {
-            const p = hijo.val();
-            const existencia = parseInt(p.existencia) || 0;
-            const precio = parseFloat(p.precio) || 0;
-            
-            totalPiezas += existencia;
-            const alertaClase = existencia <= 2 ? 'stock-low' : 'stock-ok';
-            
-            contenedor.innerHTML += `
-                <div class="product-card" data-nombre="${p.nombre.toLowerCase()}">
-                    <div class="qty-badge ${alertaClase}">${existencia}</div>
-                    <div class="product-info">
-                        <b>${p.nombre}</b>
-                        <small>ID: ${p.id}</small>
-                        <button class="edit-btn" onclick="editarItem('${p.id}', '${p.nombre}', ${precio}, ${p.costo}, ${existencia})">Editar</button>
-                    </div>
-                    <div class="price-section">
-                        <span class="price-tag">$${precio}</span>
+    // Actualización de Inventario
+    onValue(ref(db, 'juguetes/'), (snap) => {
+        const list = document.getElementById('lista-inventario');
+        list.innerHTML = "";
+        let stockTotal = 0;
+        snap.forEach(h => {
+            const p = h.val();
+            const ex = p.existencia || 0;
+            stockTotal += ex;
+            list.innerHTML += `
+                <div class="card" data-nombre="${p.nombre.toLowerCase()}">
+                    <div class="info-txt"><b>${p.nombre}</b><small>ID: ${p.id}</small></div>
+                    <div style="display:flex; align-items:center; gap:15px">
+                        <span class="price-txt">$${p.precio}</span>
+                        <div class="qty-circle ${ex <= 2 ? 'stock-low' : 'stock-ok'}">${ex}</div>
                     </div>
                 </div>`;
         });
-        document.getElementById('count-stock').innerText = totalPiezas;
+        document.getElementById('dash-stock').innerText = stockTotal;
     });
 
-    // Reporte de Ventas y Dinero en Caja
+    // Actualización de Ventas
     onValue(ref(db, 'ventas/'), (snap) => {
-        let totalCaja = 0;
-        let numVentas = 0;
-        snap.forEach((hijo) => {
-            const v = hijo.val();
-            totalCaja += parseFloat(v.precio) || 0;
-            numVentas++;
+        const list = document.getElementById('lista-ventas');
+        list.innerHTML = "";
+        let caja = 0;
+        snap.forEach(h => {
+            const v = h.val(); caja += v.precio;
+            list.innerHTML = `
+                <div class="card">
+                    <div class="info-txt"><b>${v.nombre}</b><small>🕒 ${v.hora}</small></div>
+                    <b style="color:var(--success)">$${v.precio}</b>
+                </div>` + list.innerHTML;
         });
-        document.getElementById('count-sales').innerText = numVentas;
-        document.getElementById('cash-total').innerText = "$" + totalCaja;
+        document.getElementById('dash-caja').innerText = "$" + caja;
     });
 
     window.filtrarLista = () => {
-        const busqueda = document.getElementById('buscador').value.toLowerCase();
-        document.querySelectorAll('.product-card').forEach(card => {
-            const nombre = card.getAttribute('data-nombre');
-            card.style.display = nombre.includes(busqueda) ? 'flex' : 'none';
+        const query = document.getElementById('buscador').value.toLowerCase();
+        document.querySelectorAll('#lista-inventario .card').forEach(c => {
+            c.style.display = c.getAttribute('data-nombre').includes(query) ? 'flex' : 'none';
         });
     };
 
-    window.reinicioMaestro = () => {
-        if (prompt("Clave Maestra:") === "Gael2025") {
-            if(confirm("¿Borrar todo?")) set(ref(db, '/'), null);
+    window.reinicioMaestro = () => { 
+        if(prompt("Clave Maestra:") === "Gael2025") {
+            if(confirm("¿BORRAR TODO?")) set(ref(db, '/'), null);
         }
     };
 </script>
 </body>
 </html>
-
