@@ -3,144 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gael Toys POS</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Gael Toys">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3082/3082060.png">
-    <meta name="theme-color" content="#011627">
-
+    <title>Gael Toys - Control Global</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    
     <style>
         :root {
             --primary: #4361ee; --success: #2ec4b6; --danger: #e71d36;
             --warning: #ff9f1c; --dark: #011627; --light: #f8f9fa; --white: #ffffff;
+            --royal: #7209b7;
         }
-
         * { user-select: none; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--dark); margin: 0; color: var(--white); height: 100vh; overflow: hidden; }
         
-        body { 
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto;
-            background: var(--dark); margin: 0; color: var(--white); 
-            height: 100vh; overflow: hidden;
-        }
+        .app-container { height: 100vh; display: flex; flex-direction: column; padding: 20px; justify-content: space-between; }
         
-        .app-container { 
-            height: 100vh; display: flex; flex-direction: column; 
-            padding: 20px; padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            justify-content: space-between;
-        }
+        /* Escáner */
+        #reader { width: 100%; border-radius: 25px; overflow: hidden; background: #000; border: 2px solid rgba(255,255,255,0.1); }
+        #btn-cerrar-camara { display: none; background: var(--danger); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: bold; margin-top: 10px; }
 
-        h2 { text-align: center; font-weight: 300; letter-spacing: 3px; margin: 10px 0; }
-
-        #reader { 
-            width: 100%; border-radius: 30px; overflow: hidden; 
-            background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-
-        /* BOTÓN DE CANCELAR CÁMARA */
-        #btn-cancelar-camara {
-            display: none; background: var(--danger); color: white;
-            border: none; padding: 12px; border-radius: 15px;
-            margin-top: 10px; width: 100%; font-weight: bold;
-        }
-
-        .main-dash { 
-            background: rgba(255,255,255,0.07); border-radius: 25px; 
-            padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
-        }
+        .main-dash { background: rgba(255,255,255,0.07); border-radius: 25px; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .dash-item { text-align: center; }
-        .dash-item span { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
-        .dash-item b { font-size: 22px; color: var(--success); }
+        .dash-item span { display: block; font-size: 10px; color: #888; text-transform: uppercase; }
+        .dash-item b { font-size: 20px; color: var(--success); }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-big { 
-            padding: 25px 10px; border: none; border-radius: 22px; 
-            font-size: 16px; font-weight: bold; color: white;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-        }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-big { padding: 20px; border: none; border-radius: 20px; font-size: 14px; font-weight: bold; color: white; }
         .btn-recibir { background: var(--primary); }
         .btn-vender { background: var(--danger); }
 
-        .nav-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .btn-nav { 
-            background: #1e293b; padding: 18px; border-radius: 18px; 
-            border: 1px solid #334155; color: white; font-size: 13px; font-weight: 600;
-        }
+        .nav-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .btn-nav { background: #1e293b; padding: 12px 5px; border-radius: 12px; border: none; color: white; font-size: 9px; font-weight: 600; text-transform: uppercase; }
 
-        .view-panel {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--light); color: var(--dark); z-index: 100; 
-            padding: 25px; overflow-y: auto; animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .view-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light); color: var(--dark); z-index: 100; padding: 20px; overflow-y: auto; }
+        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .btn-x { background: var(--dark); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; }
 
-        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-cerrar { background: var(--dark); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: bold; }
+        /* Estilo para las tarjetas */
+        .card { background: white; border-radius: 15px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; color: var(--dark); }
+        .fin-card { background: var(--dark); color: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; border-left: 5px solid var(--success); }
+        .fin-card h4 { margin: 0; font-size: 10px; color: #aaa; text-transform: uppercase; }
+        .fin-card p { margin: 5px 0 0 0; font-size: 24px; font-weight: bold; }
 
-        .search-bar { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; margin-bottom: 20px; font-size: 16px; outline: none; }
-
-        .card { 
-            background: white; border-radius: 20px; padding: 15px; 
-            margin-bottom: 12px; display: flex; justify-content: space-between; 
-            align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-        }
-        .qty-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 14px; }
-        .stock-ok { background: var(--primary); }
-        .stock-low { background: var(--warning); animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        .info-txt b { font-size: 15px; display: block; color: var(--dark); }
-        .info-txt small { color: var(--gray); font-size: 11px; }
-        .price-txt { font-weight: bold; color: var(--primary); font-size: 16px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: white; padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #ddd; color: var(--dark); }
+        
+        /* Tabs para ventas */
+        .tab-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; background: #ddd; font-weight: bold; font-size: 12px; }
+        .tab-btn.active { background: var(--primary); color: white; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <h2> 🧸MUNDO DE SONRISAS🧸</h2>
-
-    <div id="reader"></div>
-    <button id="btn-cancelar-camara" onclick="detenerEscaneo()">❌ CANCELAR ESCANEO</button>
-    <div id="status" style="text-align: center; font-size: 12px; color: var(--success); margin: 5px 0;">SISTEMA ACTIVO</div>
+    <h2 style="text-align:center; letter-spacing:2px; margin:0;">GAEL TOYS 👑</h2>
+    
+    <div id="scanner-wrap">
+        <div id="reader"></div>
+        <button id="btn-cerrar-camara" onclick="detenerEscaneo()">❌ CERRAR CÁMARA</button>
+    </div>
 
     <div class="main-dash">
-        <div class="dash-item"><span>💰 EN CAJA</span><b id="dash-caja">$0</b></div>
-        <div class="dash-item"><span>📦 STOCK</span><b id="dash-stock">0</b></div>
+        <div class="dash-item"><span>💰 CAJA TURNO</span><b id="dash-caja">$0</b></div>
+        <div class="dash-item"><span>📦 STOCK TOTAL</span><b id="dash-stock">0</b></div>
     </div>
 
     <div class="action-grid">
-        <button class="btn-big btn-recibir" onclick="iniciarEscaneo('agregar')">📥 Agregar</button>
+        <button class="btn-big btn-recibir" onclick="iniciarEscaneo('agregar')">📥 RECIBIR</button>
         <button class="btn-big btn-vender" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
     </div>
 
     <div class="nav-menu">
-        <button class="btn-nav" onclick="abrirPanel('panel-inventario')">📦 INVENTARIO</button>
-        <button class="btn-nav" onclick="abrirPanel('panel-ventas')">📋 VENTAS</button>
+        <button class="btn-nav" onclick="abrirPanel('panel-inventario')">STOCK</button>
+        <button class="btn-nav" onclick="abrirPanel('panel-ventas')">VENTAS</button>
+        <button class="btn-nav" onclick="abrirPanel('panel-pedidos')">PEDIDOS</button>
+        <button class="btn-nav" style="background:var(--success)" onclick="abrirPanel('panel-finanzas')">DINERO</button>
     </div>
-
-    <button onclick="reinicioMaestro()" style="background:none; border:none; color:#334155; font-size:10px; width:100%;">REINICIAR BASE DE DATOS</button>
 </div>
 
 <div id="panel-inventario" class="view-panel">
-    <div class="header-panel">
-        <h3 style="margin:0">📦 Inventario</h3>
-        <button class="btn-cerrar" onclick="cerrarPanel('panel-inventario')">VOLVER</button>
-    </div>
-    <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar juguete..." onkeyup="filtrarLista()">
+    <div class="header-panel"><h3>📦 Inventario</h3><button class="btn-x" onclick="cerrarPanel('panel-inventario')">VOLVER</button></div>
+    <input type="text" id="buscador" style="width:100%; padding:12px; border-radius:15px; border:1px solid #ddd; margin-bottom:15px;" placeholder="🔍 Buscar juguete..." onkeyup="filtrarInventario()">
     <div id="lista-inventario"></div>
 </div>
 
 <div id="panel-ventas" class="view-panel">
-    <div class="header-panel">
-        <h3 style="margin:0">📋 Ventas de Hoy</h3>
-        <button class="btn-cerrar" onclick="cerrarPanel('panel-ventas')">VOLVER</button>
+    <div class="header-panel"><h3>📋 Registro de Ventas</h3><button class="btn-x" onclick="cerrarPanel('panel-ventas')">VOLVER</button></div>
+    
+    <div class="tab-container">
+        <button class="tab-btn active" id="btn-tab-turno" onclick="switchVentas('turno')">ESTE TURNO</button>
+        <button class="tab-btn" id="btn-tab-general" onclick="switchVentas('general')">TODO LO VENDIDO</button>
     </div>
-    <div id="lista-ventas"></div>
+
+    <div id="vista-ventas-turno">
+        <div id="lista-ventas"></div>
+    </div>
+    <div id="vista-ventas-general" style="display:none;">
+        <div id="lista-ventas-general"></div>
+    </div>
+</div>
+
+<div id="panel-finanzas" class="view-panel">
+    <div class="header-panel"><h3>💵 Finanzas</h3><button class="btn-x" onclick="cerrarPanel('panel-finanzas')">VOLVER</button></div>
+    
+    <div class="fin-card" style="border-color: gold; background: #000;">
+        <h4>👑 CAJA ACUMULADA GLOBAL</h4>
+        <p id="fin-global" style="color: gold;">$0</p>
+    </div>
+
+    <div class="stats-grid">
+        <div>
+            <span style="font-size: 9px; color: #888; display: block;">MÁS VENDIDO 🔥</span>
+            <b id="top-mas" style="color: var(--success); font-size: 11px;">---</b>
+        </div>
+        <div style="border-left: 1px solid #eee; padding-left: 10px;">
+            <span style="font-size: 9px; color: #888; display: block;">MENOS VENDIDO ❄️</span>
+            <b id="top-menos" style="color: var(--danger); font-size: 11px;">---</b>
+        </div>
+    </div>
+
+    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); border:none; padding:18px; border-radius:18px; font-weight:bold; margin-bottom:20px;">🏁 FINALIZAR TURNO / CORTE</button>
+    
+    <h4 style="margin-bottom:10px;">📜 Historial de Cortes Anteriores</h4>
+    <div id="lista-cortes"></div>
+</div>
+
+<div id="panel-pedidos" class="view-panel">
+    <div class="header-panel"><h3>📝 Pedidos</h3><button class="btn-x" onclick="cerrarPanel('panel-pedidos')">VOLVER</button></div>
+    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:15px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR FALTANTE</button>
+    <div id="lista-pedidos"></div>
 </div>
 
 <script type="module">
@@ -154,20 +143,35 @@
         projectId: "miinventariojuguetes",
         storageBucket: "miinventariojuguetes.firebasestorage.app",
         messagingSenderId: "872070944528",
-        appId: "1:872070944528:web:aeb9deab706b6de0dcb795",
-        measurementId: "G-2SG32BF2G0"
+        appId: "1:872070944528:web:aeb9deab706b6de0dcb795"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const scanner = new Html5Qrcode("reader");
 
+    let cajaT = 0; let ganT = 0;
+
     window.abrirPanel = (id) => document.getElementById(id).style.display = 'block';
     window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
 
+    // Función para cambiar entre ventas turno y generales
+    window.switchVentas = (tipo) => {
+        if(tipo === 'turno') {
+            document.getElementById('vista-ventas-turno').style.display = 'block';
+            document.getElementById('vista-ventas-general').style.display = 'none';
+            document.getElementById('btn-tab-turno').classList.add('active');
+            document.getElementById('btn-tab-general').classList.remove('active');
+        } else {
+            document.getElementById('vista-ventas-turno').style.display = 'none';
+            document.getElementById('vista-ventas-general').style.display = 'block';
+            document.getElementById('btn-tab-general').classList.add('active');
+            document.getElementById('btn-tab-turno').classList.remove('active');
+        }
+    }
+
     window.iniciarEscaneo = (modo) => {
-        document.getElementById('status').innerText = "📷 ESCANEANDO...";
-        document.getElementById('btn-cancelar-camara').style.display = 'block';
+        document.getElementById('btn-cerrar-camara').style.display = 'block';
         scanner.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, (codigo) => {
             detenerEscaneo();
             procesar(codigo, modo);
@@ -175,92 +179,111 @@
     };
 
     window.detenerEscaneo = () => {
-        scanner.stop().then(() => {
-            document.getElementById('btn-cancelar-camara').style.display = 'none';
-            document.getElementById('status').innerText = "SISTEMA ACTIVO";
-        }).catch(() => {});
+        scanner.stop().then(() => { document.getElementById('btn-cerrar-camara').style.display = 'none'; }).catch(() => {});
     };
 
     async function procesar(codigo, modo) {
-        const refProd = ref(db, 'juguetes/' + codigo);
-        const snap = await get(refProd);
-
+        const refP = ref(db, 'juguetes/' + codigo);
+        const snap = await get(refP);
         if (modo === 'agregar') {
             if (snap.exists()) {
-                const actual = snap.val();
-                const cant = prompt(`Sumar a "${actual.nombre}":`, "1");
-                if (cant) update(refProd, { existencia: (parseInt(actual.existencia) || 0) + parseInt(cant) });
+                const c = prompt(`Sumar stock a: ${snap.val().nombre}`, "1");
+                if (c) update(refP, { existencia: snap.val().existencia + parseInt(c) });
             } else {
-                const nombre = prompt("Nombre del juguete:");
-                const precio = prompt("Precio de venta:");
-                const cant = prompt("¿Cuántos recibes?", "1");
-                if (nombre) set(refProd, { nombre, precio: parseFloat(precio) || 0, existencia: parseInt(cant) || 1, id: codigo });
+                const n = prompt("Nombre:"); const co = prompt("Costo:"); const pr = prompt("Venta:"); const ex = prompt("Stock:", "1");
+                if (n) set(refP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) });
             }
         } else {
             if (snap.exists()) {
                 const d = snap.val();
-                if (confirm(`¿Vender ${d.nombre}?`)) {
-                    push(ref(db, 'ventas/'), { 
-                        nombre: d.nombre, precio: d.precio, hora: new Date().toLocaleTimeString() 
-                    });
-                    if (d.existencia > 1) update(refProd, { existencia: d.existencia - 1 });
-                    else remove(refProd);
+                if (confirm(`💵 PRECIO: $${d.precio}\n¿Vender ${d.nombre}?`)) {
+                    const ventaData = { nombre: d.nombre, precio: d.precio, costo: d.costo || 0, fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString() };
+                    push(ref(db, 'ventas_actuales/'), ventaData);
+                    push(ref(db, 'ventas_generales/'), ventaData); // SE GUARDA EN AMBOS
+                    if (d.existencia > 1) update(refP, { existencia: d.existencia - 1 });
+                    else remove(refP);
                 }
-            } else alert("No está en el sistema.");
+            } else alert("No registrado");
         }
     }
 
-    onValue(ref(db, 'juguetes/'), (snap) => {
-        const list = document.getElementById('lista-inventario');
-        list.innerHTML = "";
-        let stockTotal = 0;
+    // LISTA DE VENTAS ACTUALES (TURNO)
+    onValue(ref(db, 'ventas_actuales/'), (snap) => {
+        cajaT = 0; ganT = 0;
+        const list = document.getElementById('lista-ventas'); list.innerHTML = "";
         snap.forEach(h => {
-            const p = h.val();
-            const ex = parseInt(p.existencia) || 0;
-            stockTotal += ex;
-            list.innerHTML += `
-                <div class="card" data-nombre="${p.nombre.toLowerCase()}">
-                    <div class="info-txt"><b>${p.nombre}</b><small>ID: ${p.id}</small></div>
-                    <div style="display:flex; align-items:center; gap:15px">
-                        <span class="price-txt">$${p.precio || 0}</span>
-                        <div class="qty-circle ${ex <= 2 ? 'stock-low' : 'stock-ok'}">${ex}</div>
-                    </div>
-                </div>`;
+            const v = h.val(); cajaT += v.precio; ganT += (v.precio - v.costo);
+            list.innerHTML = `<div class="card"><div><b>${v.nombre}</b><br><small>${v.hora}</small></div><b>$${v.precio}</b></div>` + list.innerHTML;
         });
-        document.getElementById('dash-stock').innerText = isNaN(stockTotal) ? 0 : stockTotal;
+        document.getElementById('dash-caja').innerText = "$" + cajaT;
+        document.getElementById('fin-turno').innerText = "$" + cajaT;
+        document.getElementById('fin-ganancia').innerText = "Ganancia Turno: $" + ganT.toFixed(2);
     });
 
-    onValue(ref(db, 'ventas/'), (snap) => {
-        const list = document.getElementById('lista-ventas');
-        list.innerHTML = "";
-        let caja = 0;
+    // LISTA DE VENTAS GENERALES (TODO EL HISTORIAL)
+    onValue(ref(db, 'ventas_generales/'), (snap) => {
+        const list = document.getElementById('lista-ventas-general'); list.innerHTML = "";
         snap.forEach(h => {
             const v = h.val();
-            const precioVenta = parseFloat(v.precio) || 0;
-            const horaVenta = v.hora || "Sin hora"; // Filtro para evitar el "undefined"
-            caja += precioVenta;
-            list.innerHTML = `
-                <div class="card">
-                    <div class="info-txt"><b>${v.nombre}</b><small>🕒 ${horaVenta}</small></div>
-                    <b style="color:var(--success)">$${precioVenta}</b>
-                </div>` + list.innerHTML;
+            list.innerHTML = `<div class="card" style="border-left: 4px solid var(--primary)"><div><b>${v.nombre}</b><br><small>${v.fecha} - ${v.hora}</small></div><b>$${v.precio}</b></div>` + list.innerHTML;
         });
-        document.getElementById('dash-caja').innerText = "$" + caja;
     });
 
-    window.filtrarLista = () => {
-        const query = document.getElementById('buscador').value.toLowerCase();
-        document.querySelectorAll('#lista-inventario .card').forEach(c => {
-            c.style.display = c.getAttribute('data-nombre').includes(query) ? 'flex' : 'none';
+    onValue(ref(db, 'juguetes/'), (snap) => {
+        let st = 0; let inv = 0;
+        const list = document.getElementById('lista-inventario'); list.innerHTML = "";
+        snap.forEach(h => {
+            const p = h.val(); st += p.existencia; inv += (p.costo * p.existencia);
+            list.innerHTML += `<div class="card"><div><b>${p.nombre}</b><br><small>$${p.precio}</small></div><b>${p.existencia} pz</b></div>`;
         });
+        document.getElementById('dash-stock').innerText = st;
+        document.getElementById('fin-inversion').innerText = "$" + inv.toFixed(2);
+    });
+
+    onValue(ref(db, 'historial_cortes/'), (snap) => {
+        let glob = 0; let conteo = {};
+        const list = document.getElementById('lista-cortes'); list.innerHTML = "";
+        snap.forEach(h => {
+            const c = h.val(); glob += c.total_venta;
+            if(c.detalles) c.detalles.forEach(p => { conteo[p.nombre] = (conteo[p.nombre] || 0) + 1; });
+            list.innerHTML = `<div class="card" style="display:block; font-size:11px;"><b>📅 ${c.fecha}</b><br>Venta: $${c.total_venta} | Ganancia: $${c.total_ganancia.toFixed(2)}</div>` + list.innerHTML;
+        });
+        let masV = { n: "---", c: 0 }; let menosV = { n: "---", c: Infinity };
+        for (let n in conteo) {
+            if (conteo[n] > masV.c) masV = { n: n, c: conteo[n] };
+            if (conteo[n] < menosV.c) menosV = { n: n, c: conteo[n] };
+        }
+        document.getElementById('top-mas').innerText = `🔥 ${masV.n} (${masV.c})`;
+        document.getElementById('top-menos').innerText = `❄️ ${menosV.n === '---' ? '---' : menosV.n} (${menosV.c === Infinity ? 0 : menosV.c})`;
+        document.getElementById('fin-global').innerText = "$" + glob;
+    });
+
+    window.realizarCorte = async () => {
+        if (cajaT === 0) return alert("Caja vacía");
+        if (confirm(`Cerrar Turno por $${cajaT}?`)) {
+            const vSnap = await get(ref(db, 'ventas_actuales/')); let vtas = [];
+            vSnap.forEach(x => vtas.push(x.val()));
+            await push(ref(db, 'historial_cortes/'), { total_venta: cajaT, total_ganancia: ganT, fecha: new Date().toLocaleString(), detalles: vtas });
+            await set(ref(db, 'ventas_actuales/'), null);
+            alert("Corte realizado");
+        }
     };
 
-    window.reinicioMaestro = () => { 
-        if(prompt("Clave:") === "Gael2025") {
-            if(confirm("¿BORRAR TODO?")) set(ref(db, '/'), null);
-        }
+    window.crearPedido = () => {
+        const p = prompt("Juguete faltante:");
+        if (p) push(ref(db, 'pedidos/'), { nombre: p, fecha: new Date().toLocaleDateString() });
+    };
+
+    onValue(ref(db, 'pedidos/'), (snap) => {
+        const list = document.getElementById('lista-pedidos'); list.innerHTML = "";
+        snap.forEach(h => { list.innerHTML = `<div class="card"><b>${h.val().nombre}</b><small>${h.val().fecha}</small></div>` + list.innerHTML; });
+    });
+
+    window.filtrarInventario = () => {
+        const q = document.getElementById('buscador').value.toLowerCase();
+        const cards = document.querySelectorAll('#lista-inventario .card');
+        cards.forEach(c => { c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none'; });
     };
 </script>
 </body>
 </html>
-
