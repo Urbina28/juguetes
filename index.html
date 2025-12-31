@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gael Toys Pro 🧸</title>
+    <title>Gael Toys Pro - Sistema 🧸</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
@@ -14,20 +13,14 @@
             --royal: #7209b7;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { 
-            font-family: -apple-system, sans-serif; background: var(--dark); 
-            color: white; height: 100vh; overflow: hidden; position: fixed; width: 100%;
-        }
+        body { font-family: -apple-system, sans-serif; background: var(--dark); color: white; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
 
         /* LOGIN */
-        #login-screen {
-            position: fixed; top:0; left:0; width:100%; height:100%; background:var(--dark);
-            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 5000;
-        }
+        #login-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--dark); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; }
         .login-card { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; text-align: center; width: 85%; }
-        .login-input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: none; font-size: 24px; text-align: center; }
+        .login-input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: none; font-size: 24px; text-align: center; outline: none; }
 
-        /* APP LAYOUT */
+        /* APP */
         .app-container { height: 100vh; display: none; flex-direction: column; padding: env(safe-area-inset-top) 15px 95px 15px; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
         #pánico { font-size: 30px; cursor: pointer; }
@@ -38,26 +31,25 @@
         #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; aspect-ratio: 1.2/1; border: 2px solid #333; }
         #btn-cancelar { display: none; width: 100%; background: var(--danger); border: none; color: white; padding: 10px; border-radius: 10px; margin-top: 5px; font-weight: bold; }
 
-        /* DASHBOARD ADMIN */
+        /* DASHBOARD */
         .main-dash { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .dash-item { background: rgba(255,255,255,0.07); padding: 12px; border-radius: 15px; text-align: center; }
         .dash-item b { font-size: 18px; color: var(--success); display: block; }
         .dash-item span { font-size: 9px; color: #888; text-transform: uppercase; }
 
-        /* BOTONES ACCIÓN */
+        /* ACCIONES */
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .btn-big { padding: 18px 10px; border: none; border-radius: 15px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; }
         
-        /* LISTA VENTAS RECIENTES */
-        #mini-ventas { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px; margin-bottom: 10px; }
-        .mini-item { padding: 8px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-size: 12px; }
+        /* MOVIMIENTOS RECIENTES */
+        #mini-movimientos { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px; margin-bottom: 10px; }
+        .mini-item { padding: 8px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-size: 11px; align-items: center; }
+        .tag { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-right: 5px; }
+        .tag-v { background: var(--danger); color: white; }
+        .tag-s { background: var(--primary); color: white; }
 
         /* NAVEGACIÓN */
-        .nav-menu { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; 
-            background: #1e293b; display: grid; grid-template-columns: repeat(4, 1fr); 
-            padding-bottom: env(safe-area-inset-bottom); z-index: 1000; border-top: 1px solid #333;
-        }
+        .nav-menu { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: #1e293b; display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom); z-index: 1000; border-top: 1px solid #333; }
         .btn-nav { background: transparent; border: none; color: #ccc; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .btn-nav span { font-size: 22px; margin-bottom: 2px; }
 
@@ -68,56 +60,52 @@
         .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .search-box { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; font-size: 16px; outline: none; }
         
-        /* TABS VENTAS */
+        .price-tag { color: var(--primary); font-weight: bold; font-size: 15px; display: block; margin-top: 4px; }
+        .stock-count { background: var(--dark); color: white; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: bold; }
+
+        /* TABS PARA VENTAS */
         .tab-group { display: flex; gap: 8px; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #ddd; color: #666; font-weight: bold; }
         .tab-btn.active { background: var(--primary); color: white; }
-
-        /* FINANZAS */
-        .fin-card { background: var(--dark); color: gold; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px; }
-        .fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .fin-box { background: white; padding: 15px; border-radius: 15px; border: 1px solid #ddd; }
-        .fin-box span { font-size: 10px; color: #888; display: block; }
-        .fin-box b { font-size: 15px; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <h1 style="font-size: 50px;">🧸</h1>
-        <h2 style="margin-bottom: 20px;">MUNDO DE SONRISAS LOGIN</h2>
-        <input type="password" id="n-pass" class="login-input" placeholder="CÓDIGO PIN" inputmode="numeric">
-        <button onclick="login()" style="width:100%; padding:18px; border-radius:15px; background:var(--success); color:white; border:none; font-weight:bold; font-size: 18px;">ENTRAR</button>
+        <h1>🧸</h1>
+        <h2>GAEL TOYS</h2>
+        <input type="password" id="n-pass" class="login-input" placeholder="PIN" inputmode="numeric">
+        <button onclick="login()" style="width:100%; padding:18px; border-radius:15px; background:var(--success); color:white; border:none; font-weight:bold;">ENTRAR</button>
     </div>
 </div>
 
 <div class="app-container" id="app-body">
     <div class="header">
         <span id="pánico" onclick="contarToques()">🧸</span>
-        <h3 id="user-title" style="font-size: 12px; letter-spacing: 1px;">MUNDO DE SONRISAS</h3>
-        <button class="btn-logout" onclick="logout()">CERRAR SESIÓN</button>
+        <h3 id="user-title" style="font-size: 12px;">GAEL TOYS PRO</h3>
+        <button class="btn-logout" onclick="logout()">SALIR</button>
     </div>
     
     <div id="scanner-wrap">
         <div id="reader"></div>
-        <button id="btn-cancelar" onclick="detenerEscaneo()">❌ CANCELAR ESCANEO</button>
+        <button id="btn-cancelar" onclick="detenerEscaneo()">❌ CANCELAR</button>
     </div>
 
     <div class="main-dash" id="dash-admin">
-        <div class="dash-item"><span>💰 CAJA TURNO</span><b id="dash-caja">$0</b></div>
+        <div class="dash-item"><span>💰 VENTA DEL CORTE</span><b id="dash-caja">$0</b></div>
         <div class="dash-item"><span>📦 STOCK TOTAL</span><b id="dash-stock">0</b></div>
     </div>
 
     <div class="action-grid">
         <button id="btn-recibir" class="btn-big" style="background:var(--primary)" onclick="iniciarEscaneo('agregar')">📥 RECIBIR</button>
         <button id="btn-vender" class="btn-big" style="background:var(--danger)" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
-        <button id="btn-ver-vendedor" class="btn-big" style="background:var(--royal); display:none; grid-column: span 2;" onclick="abrirPanel('panel-stock')">🔍 BUSCAR JUGUETE / STOCK</button>
+        <button id="btn-ver-vendedor" class="btn-big" style="background:var(--royal); display:none; grid-column: span 2;" onclick="abrirPanel('panel-stock')">🔍 CONSULTAR PRECIOS / STOCK</button>
     </div>
 
-    <div id="mini-ventas">
-        <h4 style="color:#888; font-size:10px; margin-bottom:8px; letter-spacing: 1px;">ÚLTIMOS MOVIMIENTOS</h4>
-        <div id="lista-mini-ventas"></div>
+    <div id="mini-movimientos">
+        <h4 style="color:#888; font-size:10px; margin-bottom:8px;">ÚLTIMOS MOVIMIENTOS</h4>
+        <div id="lista-mini-movimientos"></div>
     </div>
 </div>
 
@@ -129,60 +117,68 @@
 </div>
 
 <div id="panel-stock" class="view-panel">
-    <div class="panel-head"><h3 id="tit-stock">📦 Inventario</h3><button class="btn-x" onclick="cerrarPanel('panel-stock')">X</button></div>
+    <div class="panel-head"><h3>📦 Inventario y Precios</h3><button class="btn-x" onclick="cerrarPanel('panel-stock')">X</button></div>
     <input type="text" id="busc-stock" class="search-box" placeholder="Buscar juguete..." onkeyup="filtrarStock()">
     <div id="lista-inv"></div>
 </div>
 
 <div id="panel-ventas" class="view-panel">
-    <div class="panel-head"><h3>📋 Ventas</h3><button class="btn-x" onclick="cerrarPanel('panel-ventas')">X</button></div>
+    <div class="panel-head"><h3>📋 Reporte de Ventas</h3><button class="btn-x" onclick="cerrarPanel('panel-ventas')">X</button></div>
     <div class="tab-group">
-        <button id="tab-corte" class="tab-btn active" onclick="verVentas('turno')">DEL CORTE</button>
-        <button id="tab-total" class="tab-btn" onclick="verVentas('total')">HISTORIAL</button>
+        <button id="tab-corte" class="tab-btn active" onclick="verVentas('corte')">VENTA DEL CORTE</button>
+        <button id="tab-general" class="tab-btn" onclick="verVentas('generales')">VENTAS GENERALES</button>
     </div>
-    <input type="text" id="busc-ventas" class="search-box" placeholder="Filtrar por nombre..." onkeyup="filtrarVentas()">
     <div id="contenedor-ventas"></div>
 </div>
 
 <div id="panel-dinero" class="view-panel">
     <div class="panel-head"><h3>💵 Finanzas</h3><button class="btn-x" onclick="cerrarPanel('panel-dinero')">X</button></div>
-    <div class="fin-card">
-        <span>💰 ACUMULADO GLOBAL</span>
-        <h2 id="fin-global" style="font-size:40px; margin-top:5px;">$0</h2>
+    <div style="background:var(--dark); color:gold; padding:20px; border-radius:20px; text-align:center; margin-bottom:15px;">
+        <span>HISTORIAL GENERAL ACUMULADO</span><h2 id="fin-global" style="font-size:35px;">$0</h2>
     </div>
-    <div class="fin-grid">
-        <div class="fin-box"><span>GANANCIA CORTE</span><b id="fin-ganancia" style="color:var(--success)">$0</b></div>
-        <div class="fin-box"><span>INVERSIÓN STOCK</span><b id="fin-inversion">$0</b></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
+            <span style="font-size:10px; color:#888;">GANANCIA CORTE</span><b id="fin-ganancia" style="color:var(--success); display:block;">$0</b>
+        </div>
+        <div style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
+            <span style="font-size:10px; color:#888;">INVERSIÓN STOCK</span><b id="fin-inversion" style="display:block;">$0</b>
+        </div>
     </div>
-    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:15px; border:none; font-weight:bold; font-size:16px;">🏁 CERRAR CAJA / CORTE</button>
-    <h4 style="margin: 20px 0 10px 0; color: #888;">Cortes Guardados:</h4>
-    <div id="lista-cortes"></div>
+    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:15px; border:none; font-weight:bold;">🏁 REALIZAR CORTE DE CAJA</button>
+    <div id="lista-cortes" style="margin-top:15px;"></div>
 </div>
 
 <div id="panel-pedidos" class="view-panel">
-    <div class="panel-head"><h3>📝 Pedidos</h3><button class="btn-x" onclick="cerrarPanel('panel-pedidos')">X</button></div>
-    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:12px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR FALTANTE</button>
+    <div class="panel-head"><h3>📝 Pedidos Faltantes</h3><button class="btn-x" onclick="cerrarPanel('panel-pedidos')">X</button></div>
+    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:12px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR</button>
     <div id="lista-pedidos"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, update, remove, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, set, update, remove, onValue, push, get, limitToLast, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCI85dhteJ5Z4Wgb2A0pes0RI-KdaTAQlM",
         authDomain: "miinventariojuguetes.firebaseapp.com",
         databaseURL: "https://miinventariojuguetes-default-rtdb.firebaseio.com/",
-        projectId: "miinventariojuguetes",
-        storageBucket: "miinventariojuguetes.firebasestorage.app",
-        messagingSenderId: "872070944528",
-        appId: "1:872070944528:web:aeb9deab706b6de0dcb795"
+        projectId: "miinventariojuguetes"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const scanner = new Html5Qrcode("reader");
-    let cajaT = 0; let ganT = 0; let MiRol = ""; 
+    let MiRol = ""; 
+    let ventaCorteTotal = 0;
+    let gananciaCorteTotal = 0;
+
+    function avisar(msg) {
+        if (!("Notification" in window)) return;
+        if (Notification.permission === "granted") new Notification("🧸 Gael Toys", { body: msg });
+        else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(p => { if(p === "granted") new Notification("🧸 Gael Toys", { body: msg }); });
+        }
+    }
 
     window.onload = () => {
         const r = localStorage.getItem('gael_rol');
@@ -193,10 +189,10 @@
         const p = document.getElementById('n-pass').value;
         if(p === "2005") { MiRol = "admin"; localStorage.setItem('gael_rol', 'admin'); setupApp(); }
         else if(p === "0000") { MiRol = "vendedor"; localStorage.setItem('gael_rol', 'vendedor'); setupApp(); }
-        else { alert("PIN Incorrecto"); }
+        else alert("PIN incorrecto");
     };
 
-    window.logout = () => { if(confirm("¿Cerrar sesión?")) { localStorage.removeItem('gael_rol'); location.reload(); } };
+    window.logout = () => { localStorage.removeItem('gael_rol'); location.reload(); };
 
     function setupApp() {
         document.getElementById('login-screen').style.display = 'none';
@@ -206,22 +202,20 @@
             document.getElementById('dash-admin').style.display = 'none';
             document.getElementById('btn-recibir').style.display = 'none';
             document.getElementById('btn-ver-vendedor').style.display = 'block';
-            document.getElementById('pánico').style.pointerEvents = 'none';
             document.getElementById('btn-vender').style.gridColumn = 'span 2';
-            document.getElementById('btn-vender').style.height = '150px';
-            document.getElementById('user-title').innerText = "VENDEDOR";
+            document.getElementById('btn-vender').style.height = '140px';
         }
     }
 
-    window.abrirPanel = (id) => { 
-        document.getElementById(id).style.display = 'block'; 
-        if(id === 'panel-ventas') verVentas('turno'); 
+    window.abrirPanel = (id) => {
+        document.getElementById(id).style.display = 'block';
+        if(id === 'panel-ventas') verVentas('corte');
     };
     window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
 
     window.iniciarEscaneo = (modo) => {
         document.getElementById('btn-cancelar').style.display = 'block';
-        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 220 }, (c) => { detenerEscaneo(); procesar(c, modo); });
+        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 200 }, (c) => { detenerEscaneo(); procesar(c, modo); });
     };
 
     window.detenerEscaneo = () => { scanner.stop().then(() => document.getElementById('btn-cancelar').style.display = 'none').catch(()=>{}); };
@@ -232,68 +226,89 @@
         if(modo === 'agregar') {
             if(snap.exists()) {
                 const q = prompt(`Sumar stock a ${snap.val().nombre}`, "1");
-                if(q) update(rP, { existencia: snap.val().existencia + parseInt(q) });
+                if(q) {
+                    update(rP, { existencia: snap.val().existencia + parseInt(q) });
+                    push(ref(db, 'movimientos/'), { msg: `Agregó ${q} pz de ${snap.val().nombre}`, tipo: 'S', fecha: new Date().toLocaleTimeString() });
+                }
             } else {
                 const n = prompt("Nombre:"); const co = prompt("Costo:"); const pr = prompt("Venta:"); const ex = prompt("Stock:", "1");
-                if(n) set(rP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) });
+                if(n) {
+                    set(rP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) });
+                    push(ref(db, 'movimientos/'), { msg: `Nuevo: ${n}`, tipo: 'S', fecha: new Date().toLocaleTimeString() });
+                }
             }
         } else {
             if(snap.exists()) {
                 const d = snap.val();
-                if(confirm(`Vender ${d.nombre} por $${d.precio}?`)) {
-                    const v = { nombre: d.nombre, precio: d.precio, costo: d.costo || 0, hora: new Date().toLocaleTimeString(), fecha: new Date().toLocaleDateString() };
-                    push(ref(db, 'ventas_actuales/'), v); push(ref(db, 'ventas_generales/'), v);
+                if(confirm(`¿Vender ${d.nombre} por $${d.precio}?`)) {
+                    const v = { nombre: d.nombre, precio: d.precio, costo: d.costo, hora: new Date().toLocaleTimeString(), fecha: new Date().toLocaleDateString() };
+                    push(ref(db, 'ventas_actuales/'), v); 
+                    push(ref(db, 'ventas_generales/'), v);
+                    push(ref(db, 'movimientos/'), { msg: `Venta: ${d.nombre}`, tipo: 'V', fecha: v.hora });
                     if(d.existencia > 1) update(rP, { existencia: d.existencia - 1 }); else remove(rP);
+                    avisar(`Venta realizada: $${d.precio} - ${d.nombre}`);
                 }
-            } else alert("No registrado.");
+            } else alert("Código no encontrado");
         }
     }
 
-    onValue(ref(db, 'ventas_actuales/'), (snap) => {
-        cajaT = 0; ganT = 0; const list = document.getElementById('lista-mini-ventas'); list.innerHTML = "";
+    onValue(query(ref(db, 'movimientos/'), limitToLast(12)), (snap) => {
+        const list = document.getElementById('lista-mini-movimientos'); list.innerHTML = "";
         snap.forEach(h => {
-            const v = h.val(); cajaT += v.precio; ganT += (v.precio - v.costo);
-            list.innerHTML = `<div class="mini-item"><span>${v.nombre}</span><b>$${v.precio}</b></div>` + list.innerHTML;
+            const m = h.val();
+            const badge = m.tipo === 'V' ? '<span class="tag tag-v">VENTA</span>' : '<span class="tag tag-s">STOCK +</span>';
+            list.innerHTML = `<div class="mini-item"><div>${badge} ${m.msg}</div><small>${m.fecha}</small></div>` + list.innerHTML;
         });
-        document.getElementById('dash-caja').innerText = "$" + cajaT;
-        document.getElementById('fin-ganancia').innerText = "$" + ganT.toFixed(2);
+    });
+
+    onValue(ref(db, 'ventas_actuales/'), (snap) => {
+        ventaCorteTotal = 0; gananciaCorteTotal = 0;
+        snap.forEach(h => { 
+            ventaCorteTotal += h.val().precio; 
+            gananciaCorteTotal += (h.val().precio - h.val().costo);
+        });
+        document.getElementById('dash-caja').innerText = "$" + ventaCorteTotal;
+        document.getElementById('fin-ganancia').innerText = "$" + gananciaCorteTotal.toFixed(2);
     });
 
     onValue(ref(db, 'juguetes/'), (snap) => {
         let st = 0; let inv = 0; const list = document.getElementById('lista-inv'); list.innerHTML = "";
         snap.forEach(h => {
             const p = h.val(); st += p.existencia; inv += (p.costo * p.existencia);
-            list.innerHTML += `<div class="card"><b>${p.nombre}</b><span>${p.existencia} pz</span></div>`;
+            list.innerHTML += `<div class="card"><div><b>${p.nombre}</b><span class="price-tag">Precio: $${p.precio}</span></div><span class="stock-count">${p.existencia} pz</span></div>`;
         });
         document.getElementById('dash-stock').innerText = st;
         document.getElementById('fin-inversion').innerText = "$" + inv.toFixed(2);
     });
 
     window.verVentas = (tipo) => {
-        document.getElementById('tab-corte').classList.toggle('active', tipo==='turno');
-        document.getElementById('tab-total').classList.toggle('active', tipo!=='turno');
-        onValue(ref(db, tipo === 'turno' ? 'ventas_actuales/' : 'ventas_generales/'), (snap) => {
+        document.getElementById('tab-corte').classList.toggle('active', tipo === 'corte');
+        document.getElementById('tab-general').classList.toggle('active', tipo === 'generales');
+        const rV = ref(db, tipo === 'corte' ? 'ventas_actuales/' : 'ventas_generales/');
+        onValue(rV, (snap) => {
             const cont = document.getElementById('contenedor-ventas'); cont.innerHTML = "";
             snap.forEach(h => {
                 const v = h.val();
-                cont.innerHTML = `<div class="card sale-item"><div><b>${v.nombre}</b><br><small>${v.fecha}</small></div><b>$${v.precio}</b></div>` + cont.innerHTML;
+                cont.innerHTML = `<div class="card"><div><b>${v.nombre}</b><br><small>${v.fecha} ${v.hora}</small></div><b>$${v.precio}</b></div>` + cont.innerHTML;
             });
         }, { onlyOnce: true });
     };
 
     onValue(ref(db, 'historial_cortes/'), (snap) => {
-        let glob = 0; const list = document.getElementById('lista-cortes'); list.innerHTML = "";
-        snap.forEach(h => { glob += h.val().total_venta; list.innerHTML = `<div class="card"><span>${h.val().fecha}</span><b>$${h.val().total_venta}</b></div>` + list.innerHTML; });
-        document.getElementById('fin-global').innerText = "$" + glob;
+        let global = 0; const list = document.getElementById('lista-cortes'); list.innerHTML = "";
+        snap.forEach(h => { global += h.val().total_venta; list.innerHTML = `<div class="card"><span>${h.val().fecha}</span><b>$${h.val().total_venta}</b></div>` + list.innerHTML; });
+        document.getElementById('fin-global').innerText = "$" + global;
     });
 
     window.realizarCorte = async () => {
-        if(cajaT === 0) return alert("Caja vacía");
-        if(confirm(`Cerrar caja con $${cajaT}?`)) {
-            const vsnap = await get(ref(db, 'ventas_actuales/')); let vtas = [];
-            vsnap.forEach(x => vtas.push(x.val()));
-            await push(ref(db, 'historial_cortes/'), { total_venta: cajaT, total_ganancia: ganT, fecha: new Date().toLocaleString(), detalles: vtas });
-            await set(ref(db, 'ventas_actuales/'), null); alert("Corte guardado.");
+        if(ventaCorteTotal === 0) return alert("No hay ventas para el corte");
+        if(confirm(`¿Cerrar venta del corte con $${ventaCorteTotal}?`)) {
+            const snapV = await get(ref(db, 'ventas_actuales/'));
+            let detalles = []; snapV.forEach(x => detalles.push(x.val()));
+            await push(ref(db, 'historial_cortes/'), { total_venta: ventaCorteTotal, fecha: new Date().toLocaleString(), detalles: detalles });
+            await set(ref(db, 'ventas_actuales/'), null);
+            await set(ref(db, 'movimientos/'), null);
+            alert("Corte realizado.");
         }
     };
 
@@ -302,30 +317,21 @@
         document.querySelectorAll('#lista-inv .card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none');
     };
 
-    window.filtrarVentas = () => {
-        const q = document.getElementById('busc-ventas').value.toLowerCase();
-        document.querySelectorAll('.sale-item').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? 'flex' : 'none');
-    };
-
-    window.crearPedido = () => { const p = prompt("Juguete faltante:"); if(p) push(ref(db, 'pedidos/'), { nombre: p }); };
+    window.crearPedido = () => { const p = prompt("Faltante:"); if(p) push(ref(db, 'pedidos/'), { nombre: p }); };
     onValue(ref(db, 'pedidos/'), (snap) => {
-        const list = document.getElementById('lista-pedidos'); list.innerHTML = "";
-        snap.forEach(h => { list.innerHTML = `<div class="card">${h.val().nombre}</div>` + list.innerHTML; });
+        const l = document.getElementById('lista-pedidos'); l.innerHTML = "";
+        snap.forEach(h => l.innerHTML = `<div class="card"><b>${h.val().nombre}</b></div>` + l.innerHTML);
     });
 
-    let toques = 0; let tiempoT;
+    let tq = 0; let tm;
     window.contarToques = () => {
         if(MiRol !== "admin") return;
-        toques++; clearTimeout(tiempoT);
-        if (toques === 5) {
-            toques = 0;
-            if (prompt("CLAVE SEGURIDAD:") === "GAEL2024") {
-                if (confirm("¿BORRAR TODO?")) { set(ref(db, '/'), null).then(() => location.reload()); }
-            }
+        tq++; clearTimeout(tm);
+        if (tq === 5) {
+            if (prompt("CLAVE SEGURIDAD:") === "GAEL2024") set(ref(db, '/'), null).then(() => location.reload());
         }
-        tiempoT = setTimeout(() => { toques = 0; }, 2000);
+        tm = setTimeout(() => tq = 0, 2000);
     };
 </script>
 </body>
 </html>
-
