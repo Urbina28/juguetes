@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Gael Toys Pro 🧸</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
@@ -20,30 +21,25 @@
         .login-card { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; text-align: center; width: 85%; }
         .login-input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: none; font-size: 24px; text-align: center; outline: none; }
 
-        /* ESTRUCTURA */
+        /* APP ESTRUCTURA */
         .app-container { height: 100vh; display: none; flex-direction: column; padding: env(safe-area-inset-top) 15px 95px 15px; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-        .btn-notif { background: #222; border: 1px solid gold; color: gold; padding: 8px 12px; border-radius: 12px; font-size: 14px; }
+        .btn-notif { background: #222; border: 2px solid gold; color: gold; padding: 8px 12px; border-radius: 12px; font-size: 14px; font-weight: bold; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         /* SCANNER */
         #scanner-wrap { width: 100%; max-width: 250px; margin: 0 auto 10px auto; text-align: center; }
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; border: 2px solid #333; aspect-ratio: 1.2; }
+        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; border: 2px solid #333; aspect-ratio: 1; }
 
-        /* DASHBOARD INICIAL */
+        /* DASHBOARDS */
         .main-dash { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .dash-item { background: rgba(255,255,255,0.07); padding: 12px; border-radius: 15px; text-align: center; }
         .dash-item b { font-size: 18px; color: var(--success); display: block; }
         .dash-item span { font-size: 9px; color: #888; text-transform: uppercase; }
 
-        /* ACCIONES */
+        /* BOTONES */
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .btn-big { padding: 15px; border: none; border-radius: 15px; font-size: 13px; font-weight: bold; color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-
-        /* LISTA MOVIMIENTOS */
-        #mini-movs { flex: 1; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px; margin-bottom: 5px; }
-        .mini-item { padding: 8px 0; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-size: 11px; }
-        .tag-v { color: var(--danger); font-weight: bold; }
-        .tag-s { color: var(--primary); font-weight: bold; }
 
         /* NAVEGACIÓN */
         .nav-menu { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: #0f172a; display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #333; }
@@ -55,23 +51,23 @@
         .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
         .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        /* TABS VENTAS */
+        /* TABS */
         .tab-group { display: flex; gap: 5px; margin-bottom: 10px; }
-        .tab { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #ddd; font-weight: bold; font-size: 11px; }
+        .tab { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #ddd; font-weight: bold; }
         .tab.active { background: var(--primary); color: white; }
 
-        /* AVISO DE VENTA */
-        #notif-pantalla { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 15px 30px; border-radius: 50px; font-weight: bold; z-index: 6000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        /* AVISO VENTA */
+        #notif-pantalla { display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 15px 30px; border-radius: 50px; font-weight: bold; z-index: 6000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
-<div id="notif-pantalla">✅ ¡VENDIDO CON ÉXITO!</div>
+<div id="notif-pantalla">✅ VENDIDO CON ÉXITO</div>
 
 <div id="login-screen">
     <div class="login-card">
         <h1>🧸</h1>
-        <h2 style="margin-bottom: 15px;">GAEL TOYS</h2>
+        <h2>GAEL TOYS</h2>
         <input type="password" id="n-pass" class="login-input" placeholder="PIN" inputmode="numeric">
         <button onclick="login()" style="width:100%; padding:18px; border-radius:15px; background:var(--success); color:white; border:none; font-weight:bold;">ENTRAR</button>
     </div>
@@ -86,7 +82,7 @@
     
     <div id="scanner-wrap">
         <div id="reader"></div>
-        <button id="btn-cancelar" onclick="detenerEscaneo()" style="display:none; width:100%; background:var(--danger); border:none; color:white; padding:8px; border-radius:10px; margin-top:5px; font-weight:bold;">CERRAR</button>
+        <button id="btn-cancelar" onclick="detenerEscaneo()" style="display:none; width:100%; background:var(--danger); border:none; color:white; padding:8px; border-radius:10px; margin-top:5px; font-weight:bold;">CANCELAR</button>
     </div>
 
     <div class="main-dash" id="dash-admin">
@@ -101,7 +97,7 @@
         <button id="btn-v-pedir" class="btn-big" style="background:var(--warning); display:none; grid-column: span 1;" onclick="abrirPanel('panel-pedidos')">📝 PEDIDO</button>
     </div>
 
-    <div id="mini-movs">
+    <div id="mini-movs" style="flex:1; overflow-y:auto; background:rgba(0,0,0,0.1); border-radius:15px; padding:10px;">
         <div id="lista-mini"></div>
     </div>
 </div>
@@ -114,32 +110,23 @@
 </nav>
 
 <div id="panel-dinero" class="view-panel">
-    <div class="panel-head"><h2>Finanzas Pro</h2><button class="btn-x" onclick="cerrarPanel('panel-dinero')">X</button></div>
-    
+    <div class="panel-head"><h2>Dinero</h2><button class="btn-x" onclick="cerrarPanel('panel-dinero')">X</button></div>
     <div style="background:var(--dark); color:white; padding:20px; border-radius:20px; text-align:center; margin-bottom:15px;">
-        <span style="color:var(--success); font-size:12px;">VENTA DEL CORTE (ACTUAL)</span>
+        <span style="color:var(--success);">VENTA DEL CORTE (ACTUAL)</span>
         <h2 id="fin-corte-real" style="font-size:40px;">$0</h2>
     </div>
-
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <div style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
-            <span style="font-size:10px; color:#888;">GANANCIA CORTE</span><b id="fin-ganancia" style="color:var(--success); display:block;">$0</b>
-        </div>
-        <div style="background:white; padding:15px; border-radius:15px; border:1px solid #ddd;">
-            <span style="font-size:10px; color:#888;">INVERSIÓN STOCK</span><b id="fin-inversion" style="display:block;">$0</b>
-        </div>
+        <div style="background:white; padding:15px; border-radius:15px;"><span>GANANCIA CORTE</span><b id="fin-ganancia" style="color:var(--success);">$0</b></div>
+        <div style="background:white; padding:15px; border-radius:15px;"><span>INVERSIÓN STOCK</span><b id="fin-inversion">$0</b></div>
     </div>
-
-    <div style="background:gold; color:var(--dark); padding:15px; border-radius:15px; text-align:center; margin-bottom:15px;">
-        <span style="font-size:10px; font-weight:bold;">VENTAS GENERALES (HISTORIAL)</span>
-        <h2 id="fin-global" style="font-size:24px;">$0</h2>
+    <div style="background:gold; padding:15px; border-radius:15px; text-align:center; margin-bottom:15px;">
+        <span>VENTAS GENERALES ACUMULADAS</span><h2 id="fin-global">$0</h2>
     </div>
-
-    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:15px; border:none; font-weight:bold; font-size:16px;">🏁 FINALIZAR CORTE DE CAJA</button>
+    <button onclick="realizarCorte()" style="width:100%; background:var(--warning); padding:18px; border-radius:15px; border:none; font-weight:bold;">FINALIZAR CORTE</button>
 </div>
 
 <div id="panel-ventas" class="view-panel">
-    <div class="panel-head"><h2>Historial de Ventas</h2><button class="btn-x" onclick="cerrarPanel('panel-ventas')">X</button></div>
+    <div class="panel-head"><h2>Historial</h2><button class="btn-x" onclick="cerrarPanel('panel-ventas')">X</button></div>
     <div class="tab-group">
         <button id="t-corte" class="tab active" onclick="verVentas('corte')">VENTA DEL CORTE</button>
         <button id="t-general" class="tab" onclick="verVentas('general')">VENTAS GENERALES</button>
@@ -148,15 +135,15 @@
 </div>
 
 <div id="panel-stock" class="view-panel">
-    <div class="panel-head"><h2>Inventario y Precios</h2><button class="btn-x" onclick="cerrarPanel('panel-stock')">X</button></div>
-    <input type="text" id="busc-stock" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:10px;" placeholder="Buscar..." onkeyup="filtrarStock()">
+    <div class="panel-head"><h2>Stock</h2><button class="btn-x" onclick="cerrarPanel('panel-stock')">X</button></div>
+    <input type="text" id="busc-stock" style="width:100%; padding:15px; border-radius:12px; margin-bottom:10px;" placeholder="Buscar..." onkeyup="filtrarStock()">
     <div id="lista-inv"></div>
 </div>
 
 <div id="panel-pedidos" class="view-panel">
-    <div class="panel-head"><h2>Faltantes</h2><button class="btn-x" onclick="cerrarPanel('panel-pedidos')">X</button></div>
-    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:12px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR</button>
-    <div id="lista-pedidos"></div>
+    <div class="panel-head"><h2>Pedidos</h2><button class="btn-x" onclick="cerrarPanel('panel-pedidos')">X</button></div>
+    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:12px; background:var(--royal); color:white; border:none; font-weight:bold;">+ ANOTAR FALTANTE</button>
+    <div id="lista-pedidos" style="margin-top:10px;"></div>
 </div>
 
 <script type="module">
@@ -173,15 +160,35 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const scanner = new Html5Qrcode("reader");
-    let MiRol = ""; let ventaCorteTotal = 0; let gananciaCorte = 0;
+    let MiRol = ""; let vCorte = 0; let gCorte = 0;
 
     window.pedirPermiso = () => {
-        Notification.requestPermission().then(p => { if(p==='granted') alert("Notificaciones listas para Admin 🧸"); });
+        Notification.requestPermission().then(p => {
+            if(p==='granted') {
+                new Notification("🧸 Gael Toys", { body: "Notificaciones activadas como mensaje." });
+                document.getElementById('btn-permiso').innerText = "✅ AVISOS OK";
+                document.getElementById('btn-permiso').style.animation = "none";
+            }
+        });
     };
 
-    function mostrarExito() {
+    function lanzarNotificacion(titulo, cuerpo) {
+        // Vibrar celular (solo Android)
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        
+        // Notificación de sistema
+        if (MiRol === "admin" && Notification.permission === "granted") {
+            new Notification(titulo, {
+                body: cuerpo,
+                icon: "https://cdn-icons-png.flaticon.com/512/3082/3082060.png",
+                badge: "https://cdn-icons-png.flaticon.com/512/3082/3082060.png"
+            });
+        }
+        
+        // Aviso visual en pantalla
         const d = document.getElementById('notif-pantalla');
-        d.style.display = 'block'; setTimeout(() => d.style.display = 'none', 2000);
+        d.innerText = `✅ ${titulo}: ${cuerpo}`;
+        d.style.display = 'block'; setTimeout(() => d.style.display = 'none', 3000);
     }
 
     window.onload = () => {
@@ -220,7 +227,7 @@
 
     window.iniciarEscaneo = (modo) => {
         document.getElementById('btn-cancelar').style.display = 'block';
-        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 220 }, (c) => { detenerEscaneo(); procesar(c, modo); });
+        scanner.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (c) => { detenerEscaneo(); procesar(c, modo); });
     };
     window.detenerEscaneo = () => { scanner.stop().then(()=>document.getElementById('btn-cancelar').style.display='none').catch(()=>{}); };
 
@@ -230,7 +237,10 @@
         if(modo === 'agregar') {
             if(snap.exists()) {
                 const q = prompt(`Sumar stock a ${snap.val().nombre}`, "1");
-                if(q) { update(rP, { existencia: snap.val().existencia + parseInt(q) }); push(ref(db, 'movimientos/'), { msg: `Sumó ${q} pz de ${snap.val().nombre}`, tipo: 'S', fecha: new Date().toLocaleTimeString() }); }
+                if(q) { 
+                    update(rP, { existencia: snap.val().existencia + parseInt(q) }); 
+                    push(ref(db, 'movimientos/'), { msg: `Recibió ${q} pz de ${snap.val().nombre}`, tipo: 'S', fecha: new Date().toLocaleTimeString() }); 
+                }
             } else {
                 const n = prompt("Nombre:"); const co = prompt("Costo:"); const pr = prompt("Venta:"); const ex = prompt("Stock:", "1");
                 if(n) { set(rP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) }); push(ref(db, 'movimientos/'), { msg: `Nuevo: ${n}`, tipo: 'S', fecha: new Date().toLocaleTimeString() }); }
@@ -244,39 +254,30 @@
                     push(ref(db, 'movimientos/'), { msg: `Venta: ${d.nombre}`, tipo: 'V', fecha: v.hora });
                     if(d.existencia > 1) update(rP, { existencia: d.existencia - 1 }); else remove(rP);
                     
-                    mostrarExito();
-                    if(MiRol === "admin" && Notification.permission === "granted") new Notification("🧸 Venta: $" + d.precio, { body: d.nombre });
+                    lanzarNotificacion("VENTA EXITOSA", `$${d.precio} - ${d.nombre}`);
                 }
-            } else alert("No existe.");
+            } else alert("Código no encontrado.");
         }
     }
 
-    onValue(query(ref(db, 'movimientos/'), limitToLast(10)), (snap) => {
-        const list = document.getElementById('lista-mini'); list.innerHTML = "";
-        snap.forEach(h => {
-            const m = h.val(); const cl = m.tipo === 'V' ? 'tag-v' : 'tag-s';
-            list.innerHTML = `<div class="mini-item"><span class="${cl}">${m.tipo==='V'?'Venta':'Stock'}</span> <span>${m.msg}</span> <small>${m.fecha}</small></div>` + list.innerHTML;
-        });
-    });
-
     onValue(ref(db, 'ventas_actuales/'), (snap) => {
-        ventaCorteTotal = 0; gananciaCorte = 0;
-        snap.forEach(h => { ventaCorteTotal += h.val().precio; gananciaCorte += (h.val().precio - h.val().costo); });
-        document.getElementById('dash-caja').innerText = "$" + ventaCorteTotal;
-        document.getElementById('fin-corte-real').innerText = "$" + ventaCorteTotal;
-        document.getElementById('fin-ganancia').innerText = "$" + gananciaCorte.toFixed(2);
+        vCorte = 0; gCorte = 0;
+        snap.forEach(h => { vCorte += h.val().precio; gCorte += (h.val().precio - h.val().costo); });
+        document.getElementById('dash-caja').innerText = "$" + vCorte;
+        document.getElementById('fin-corte-real').innerText = "$" + vCorte;
+        document.getElementById('fin-ganancia').innerText = "$" + gCorte.toFixed(2);
     });
 
     onValue(ref(db, 'ventas_generales/'), (snap) => {
-        let gen = 0; snap.forEach(h => gen += h.val().precio);
-        document.getElementById('fin-global').innerText = "$" + gen;
+        let total = 0; snap.forEach(h => total += h.val().precio);
+        document.getElementById('fin-global').innerText = "$" + total;
     });
 
     onValue(ref(db, 'juguetes/'), (snap) => {
         let st = 0; let inv = 0; const list = document.getElementById('lista-inv'); list.innerHTML = "";
         snap.forEach(h => {
             const p = h.val(); st += p.existencia; inv += (p.costo * p.existencia);
-            list.innerHTML += `<div class="card"><div><b>${p.nombre}</b><span style="display:block; color:var(--primary); font-weight:bold;">$${p.precio}</span></div><span class="stock-count">${p.existencia} pz</span></div>`;
+            list.innerHTML += `<div class="card"><div><b>${p.nombre}</b><br><span style="color:var(--primary); font-weight:bold;">$${p.precio}</span></div><span class="stock-count">${p.existencia} pz</span></div>`;
         });
         document.getElementById('dash-stock').innerText = st;
         document.getElementById('fin-inversion').innerText = "$" + inv.toFixed(2);
@@ -293,9 +294,9 @@
     };
 
     window.realizarCorte = async () => {
-        if(ventaCorteTotal === 0) return alert("Caja vacía");
-        if(confirm(`¿Cerrar venta del corte con $${ventaCorteTotal}?`)) {
-            await push(ref(db, 'historial_cortes/'), { total_venta: ventaCorteTotal, ganancia: gananciaCorte, fecha: new Date().toLocaleString() });
+        if(vCorte === 0) return alert("Caja vacía");
+        if(confirm(`¿Cerrar venta del corte con $${vCorte}?`)) {
+            await push(ref(db, 'historial_cortes/'), { total_venta: vCorte, fecha: new Date().toLocaleString() });
             await set(ref(db, 'ventas_actuales/'), null); await set(ref(db, 'movimientos/'), null);
             alert("CORTE REALIZADO.");
         }
@@ -310,6 +311,14 @@
     onValue(ref(db, 'pedidos/'), (snap) => {
         const l = document.getElementById('lista-pedidos'); l.innerHTML = "";
         snap.forEach(h => l.innerHTML = `<div class="card"><b>${h.val().nombre}</b></div>` + l.innerHTML);
+    });
+
+    onValue(query(ref(db, 'movimientos/'), limitToLast(10)), (snap) => {
+        const l = document.getElementById('lista-mini'); l.innerHTML = "";
+        snap.forEach(h => {
+            const m = h.val(); const color = m.tipo === 'V' ? 'var(--danger)' : 'var(--primary)';
+            l.innerHTML = `<div style="font-size:11px; padding:5px 0; border-bottom:1px solid #333;"><b style="color:${color}">${m.tipo==='V'?'VENTA':'STOCK'}</b> ${m.msg} <small style="float:right; color:#666">${m.fecha}</small></div>` + l.innerHTML;
+        });
     });
 
     let tq = 0; let tm;
