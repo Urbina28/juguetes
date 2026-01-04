@@ -2,282 +2,186 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Venta del Corte</title>
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gael Toys Pro 🧸</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="VentaCorte">
+    
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        :root {
-            --primary: #4361ee; --success: #2ec4b6; --danger: #e71d36;
-            --warning: #ff9f1c; --dark: #011627; --light: #f8f9fa; --white: #ffffff;
-            --royal: #7209b7;
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        
+        :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --dark: #1e293b; }
         body { 
-            font-family: -apple-system, sans-serif; 
-            background: var(--dark); 
-            color: white; 
-            height: 100vh; 
-            overflow: hidden; 
-            position: fixed; 
-            width: 100%;
-            padding-top: env(safe-area-inset-top);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f1f5f9; margin: 0; padding: env(safe-area-inset-top) 10px 20px 10px;
+            display: flex; flex-direction: column; align-items: center; 
         }
+        .container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 450px; box-sizing: border-box; }
+        
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; min-height: 200px; border: 3px solid var(--primary); }
+        
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; }
+        .stat-card { padding: 12px 5px; border-radius: 12px; text-align: center; color: white; font-weight: bold; }
+        .bg-blue { background: var(--primary); } .bg-orange { background: #f59e0b; } .bg-green { background: var(--success); }
+        .stat-card small { font-size: 0.65rem; display: block; opacity: 0.9; text-transform: uppercase; }
+        .stat-card strong { font-size: 0.9rem; }
 
-        /* LOGIN */
-        #login-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--dark); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; }
-        .login-card { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; text-align: center; width: 85%; }
-        .login-input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: none; font-size: 24px; text-align: center; outline: none; }
+        .form-group { margin-bottom: 10px; }
+        input { 
+            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; 
+            box-sizing: border-box; font-size: 16px; -webkit-appearance: none; 
+        }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        button { 
+            width: 100%; padding: 15px; border: none; border-radius: 12px; cursor: pointer; 
+            font-size: 16px; font-weight: bold; transition: 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        .btn-add { background: var(--dark); color: white; margin-top: 5px; }
+        .btn-camera { background: #e2e8f0; color: var(--dark); margin-bottom: 15px; font-size: 14px; }
+        .btn-camera.active { background: var(--danger); color: white; }
+        .btn-download { background: var(--success); color: white; margin-top: 15px; }
+        .btn-panic { background: transparent; color: var(--danger); margin-top: 20px; font-size: 12px; text-decoration: underline; }
 
-        /* APP ESTRUCTURA */
-        .app-container { height: 100%; display: none; flex-direction: column; padding: 10px 15px 100px 15px; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-        .btn-notif { background: #222; border: 2px solid gold; color: gold; padding: 8px 12px; border-radius: 12px; font-size: 13px; font-weight: bold; }
-
-        /* SCANNER */
-        #scanner-wrap { width: 100%; max-width: 320px; margin: 0 auto 10px auto; }
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; background: #000; border: 2px solid #333; }
-
-        /* DASHBOARDS */
-        .main-dash { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .dash-item { background: rgba(255,255,255,0.07); padding: 12px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .dash-item b { font-size: 20px; color: var(--success); display: block; }
-        .dash-item span { font-size: 9px; color: #888; text-transform: uppercase; }
-
-        /* BOTONES */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .btn-big { padding: 18px; border: none; border-radius: 18px; font-size: 14px; font-weight: bold; color: white; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-
-        /* NAVEGACIÓN */
-        .nav-menu { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: #0f172a; display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #333; z-index: 1000; }
-        .btn-nav { background: transparent; border: none; color: #94a3b8; font-size: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .btn-nav span { font-size: 24px; margin-bottom: 4px; }
-
-        /* PANELES */
-        .view-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light); color: var(--dark); z-index: 2000; padding: env(safe-area-inset-top) 20px 100px 20px; overflow-y: auto; }
-        .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .card { background: white; padding: 18px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-
-        #notif-pantalla { display: none; position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 15px 30px; border-radius: 50px; font-weight: bold; z-index: 6000; border: 2px solid white; }
+        .tabla-container { width: 100%; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; }
+        th { background: #f8fafc; padding: 12px 8px; text-align: left; color: #64748b; }
+        td { padding: 12px 8px; border-top: 1px solid #e2e8f0; }
+        .ganancia-plus { color: var(--success); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="notif-pantalla">✅ VENTA REGISTRADA</div>
+<div class="container">
+    <h2 style="text-align:center; color: var(--dark); margin-bottom: 15px; font-size: 1.2rem;">Ventas Katy Urbina</h2>
 
-<div id="login-screen">
-    <div class="login-card">
-        <h1>🧸</h1>
-        <h2>GAEL TOYS</h2>
-        <input type="password" id="n-pass" class="login-input" placeholder="PIN" inputmode="numeric">
-        <button onclick="login()" style="width:100%; padding:20px; border-radius:18px; background:var(--success); color:white; border:none; font-weight:bold;">ENTRAR</button>
-    </div>
-</div>
+    <div id="reader"></div>
+    <button id="btnToggleCam" class="btn-camera" onclick="toggleCam()">📷 ENCENDER SCANNER</button>
 
-<div class="app-container" id="app-body">
-    <div class="header">
-        <span onclick="contarToques()">🧸</span>
-        <button class="btn-notif" id="btn-permiso" onclick="pedirPermiso()">🔔 ACTIVAR ALERTAS</button>
-        <button onclick="logout()" style="border:none; background:none; color:#666; font-size:11px;">SALIR</button>
+    <div class="dashboard">
+        <div class="stat-card bg-blue"><small>Ventas</small><strong id="totalVenta">$0</strong></div>
+        <div class="stat-card bg-orange"><small>Inversión</small><strong id="totalInversion">$0</strong></div>
+        <div class="stat-card bg-green"><small>Ganancia</small><strong id="totalGanancia">$0</strong></div>
     </div>
+
+    <div class="form-group">
+        <input type="text" id="nombre" placeholder="Nombre del producto">
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <input type="text" id="codigo" placeholder="Código" readonly style="background: #f1f5f9; flex: 1.2;">
+        <input type="number" id="inversion" placeholder="Costo" style="flex: 0.9;">
+        <input type="number" id="venta" placeholder="Venta" style="flex: 0.9;">
+    </div>
+
+    <button class="btn-add" onclick="registrarVenta()">REGISTRAR VENTA</button>
     
-    <div id="scanner-wrap">
-        <div id="reader"></div>
-        <button id="btn-cancelar" onclick="detenerEscaneo()" style="display:none; width:100%; background:var(--danger); color:white; padding:15px; border-radius:15px; margin-top:10px; border:none; font-weight:bold;">CANCELAR</button>
+    <div class="tabla-container">
+        <table id="tablaVentas">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Producto</th>
+                    <th>Venta</th>
+                    <th>Gan.</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-    <div class="main-dash" id="dash-admin">
-        <div class="dash-item"><span>VENTA DEL CORTE</span><b id="dash-caja">$0</b></div>
-        <div class="dash-item"><span>STOCK TOTAL</span><b id="dash-stock">0</b></div>
-    </div>
-
-    <div class="action-grid">
-        <button id="btn-recibir" class="btn-big" style="background:var(--primary)" onclick="iniciarEscaneo('agregar')">📥 RECIBIR</button>
-        <button id="btn-vender" class="btn-big" style="background:var(--danger)" onclick="iniciarEscaneo('vender')">📤 VENDER</button>
-        <button id="btn-v-stock" class="btn-big" style="background:var(--royal); display:none; grid-column: span 1;" onclick="abrirPanel('panel-stock')">🔍 PRECIOS</button>
-        <button id="btn-v-pedir" class="btn-big" style="background:var(--warning); display:none; grid-column: span 1;" onclick="abrirPanel('panel-pedidos')">📝 PEDIDO</button>
-    </div>
-
-    <div id="mini-movs" style="flex:1; overflow-y:auto; background:rgba(0,0,0,0.1); border-radius:15px; padding:10px;">
-        <div id="lista-mini"></div>
-    </div>
+    <button class="btn-download" onclick="descargarExcel()">⬇️ GUARDAR REPORTE (CSV)</button>
+    <button class="btn-panic" onclick="botonPanico()">Borrar sesión actual</button>
 </div>
 
-<nav class="nav-menu" id="menu-inferior">
-    <button class="btn-nav" onclick="abrirPanel('panel-stock')"><span>📦</span>STOCK</button>
-    <button class="btn-nav" onclick="abrirPanel('panel-ventas')"><span>📋</span>VENTAS</button>
-    <button class="btn-nav" onclick="abrirPanel('panel-pedidos')"><span>📝</span>PEDIDOS</button>
-    <button class="btn-nav" onclick="abrirPanel('panel-dinero')"><span>💵</span>DINERO</button>
-</nav>
+<script>
+    let registroVentas = [];
+    let totales = { inversion: 0, venta: 0, ganancia: 0 };
+    let html5QrCode = null;
+    let isCamOn = false;
 
-<div id="panel-dinero" class="view-panel">
-    <div class="panel-head"><h2>💵 Finanzas</h2><button onclick="cerrarPanel('panel-dinero')">X</button></div>
-    
-    <div style="background:var(--dark); color:white; padding:20px; border-radius:20px; text-align:center; margin-bottom:15px;">
-        <span style="color:var(--success); font-size:11px;">VENTA DEL CORTE (ACTUAL)</span>
-        <h2 id="fin-corte-real" style="font-size:40px;">$0</h2>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <div style="background:white; padding:15px; border-radius:15px;"><span>GANANCIA</span><b id="fin-ganancia" style="color:var(--success); display:block;">$0</b></div>
-        <div style="background:white; padding:15px; border-radius:15px;"><span>INVERSIÓN</span><b id="fin-inversion" style="display:block;">$0</b></div>
-    </div>
-
-    <div style="background:var(--warning); padding:15px; border-radius:15px; text-align:center; margin-bottom:20px;">
-        <span>VENTAS GENERALES ACUMULADAS</span>
-        <h2 id="fin-global">$0</h2>
-    </div>
-
-    <button onclick="realizarCorte()" style="width:100%; background:var(--success); color:white; padding:18px; border-radius:15px; border:none; font-weight:bold; margin-bottom:25px;">FINALIZAR CORTE</button>
-
-    <h3 style="margin-bottom:10px;">🏆 COMPARATIVA DE CORTES</h3>
-    <div id="lista-historial-cortes"></div>
-</div>
-
-<div id="panel-ventas" class="view-panel">
-    <div class="panel-head"><h2>📋 Ventas</h2><button onclick="cerrarPanel('panel-ventas')">X</button></div>
-    <div style="display:flex; gap:5px; margin-bottom:15px;">
-        <button id="t-corte" style="flex:1; padding:10px; border-radius:10px; border:none;" onclick="verVentas('corte')">CORTE</button>
-        <button id="t-general" style="flex:1; padding:10px; border-radius:10px; border:none;" onclick="verVentas('general')">GENERAL</button>
-    </div>
-    <div id="contenedor-ventas"></div>
-</div>
-
-<div id="panel-stock" class="view-panel">
-    <div class="panel-head"><h2>📦 Stock</h2><button onclick="cerrarPanel('panel-stock')">X</button></div>
-    <input type="text" id="busc-stock" style="width:100%; padding:15px; border-radius:12px; margin-bottom:10px;" placeholder="Buscar..." onkeyup="filtrarStock()">
-    <div id="lista-inv"></div>
-</div>
-
-<div id="panel-pedidos" class="view-panel">
-    <div class="panel-head"><h2>📝 Pedidos</h2><button onclick="cerrarPanel('panel-pedidos')">X</button></div>
-    <button onclick="crearPedido()" style="width:100%; padding:15px; border-radius:12px; background:var(--royal); color:white; border:none; font-weight:bold; margin-bottom:15px;">+ ANOTAR FALTANTE</button>
-    <div id="lista-pedidos"></div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, update, remove, onValue, push, get, limitToLast, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCI85dhteJ5Z4Wgb2A0pes0RI-KdaTAQlM",
-        authDomain: "miinventariojuguetes.firebaseapp.com",
-        databaseURL: "https://miinventariojuguetes-default-rtdb.firebaseio.com/",
-        projectId: "miinventariojuguetes"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const scanner = new Html5Qrcode("reader");
-    let MiRol = ""; let vCorte = 0; let gCorte = 0;
-
-    window.pedirPermiso = () => {
-        Notification.requestPermission().then(p => { if(p==='granted') new Notification("🧸 Gael Toys", { body: "Avisos activados." }); });
-    };
-
-    function lanzarNotif(t, m) {
-        if (MiRol === "admin" && Notification.permission === "granted") new Notification(t, { body: m });
-        const d = document.getElementById('notif-pantalla');
-        d.innerText = "✅ " + t + ": " + m;
-        d.style.display = 'block'; setTimeout(() => d.style.display = 'none', 3000);
-    }
-
-    window.login = () => {
-        const p = document.getElementById('n-pass').value;
-        if(p === "2005") { MiRol = "admin"; localStorage.setItem('gael_rol', 'admin'); setup(); }
-        else if(p === "0000") { MiRol = "vendedor"; localStorage.setItem('gael_rol', 'vendedor'); setup(); }
-        else alert("PIN INCORRECTO");
-    };
-
-    window.logout = () => { localStorage.removeItem('gael_rol'); location.reload(); };
-
-    function setup() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-body').style.display = 'flex';
-        if(MiRol === "vendedor") {
-            document.getElementById('menu-inferior').style.display = 'none';
-            document.getElementById('dash-admin').style.display = 'none';
-            document.getElementById('btn-recibir').style.display = 'none';
-            document.getElementById('btn-vender').style.gridColumn = 'span 2';
-            document.getElementById('btn-v-stock').style.display = 'flex';
-            document.getElementById('btn-v-pedir').style.display = 'flex';
-        }
-    }
-
-    window.abrirPanel = (id) => { document.getElementById(id).style.display = 'block'; };
-    window.cerrarPanel = (id) => document.getElementById(id).style.display = 'none';
-
-    window.iniciarEscaneo = (modo) => {
-        document.getElementById('btn-cancelar').style.display = 'block';
-        scanner.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 250, height: 150 } }, 
-        (c) => { detenerEscaneo(); procesar(c, modo); }).catch(e => alert("Error cámara"));
-    };
-
-    window.detenerEscaneo = () => { scanner.stop().then(()=>document.getElementById('btn-cancelar').style.display='none').catch(()=>{}); };
-
-    async function procesar(cod, modo) {
-        const rP = ref(db, 'juguetes/' + cod);
-        const snap = await get(rP);
-        if(modo === 'agregar') {
-            if(snap.exists()) {
-                const q = prompt(`Sumar stock a ${snap.val().nombre}`, "1");
-                if(q) { update(rP, { existencia: snap.val().existencia + parseInt(q) }); push(ref(db, 'movimientos/'), { msg: `Recibió ${q} de ${snap.val().nombre}`, tipo: 'S', fecha: new Date().toLocaleTimeString() }); }
-            } else {
-                const n = prompt("Nombre:"); const co = prompt("Costo:"); const pr = prompt("Venta:"); const ex = prompt("Stock:", "1");
-                if(n) { set(rP, { nombre: n, costo: parseFloat(co), precio: parseFloat(pr), existencia: parseInt(ex) }); push(ref(db, 'movimientos/'), { msg: `Nuevo: ${n}`, tipo: 'S', fecha: new Date().toLocaleTimeString() }); }
-            }
+    async function toggleCam() {
+        const btn = document.getElementById('btnToggleCam');
+        if (!isCamOn) {
+            html5QrCode = new Html5Qrcode("reader");
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    { fps: 15, qrbox: { width: 250, height: 150 } },
+                    (decodedText) => {
+                        document.getElementById('codigo').value = decodedText;
+                        if (navigator.vibrate) navigator.vibrate(70);
+                        document.getElementById('nombre').focus();
+                    }
+                );
+                isCamOn = true;
+                btn.innerText = "❌ APAGAR SCANNER";
+                btn.classList.add("active");
+            } catch (err) { alert("Cámara no disponible"); }
         } else {
-            if(snap.exists()) {
-                const d = snap.val();
-                if(confirm(`¿Vender ${d.nombre} por $${d.precio}?`)) {
-                    const v = { nombre: d.nombre, precio: d.precio, costo: d.costo, hora: new Date().toLocaleTimeString(), fecha: new Date().toLocaleDateString() };
-                    push(ref(db, 'ventas_actuales/'), v); push(ref(db, 'ventas_generales/'), v);
-                    push(ref(db, 'movimientos/'), { msg: `Venta: ${d.nombre}`, tipo: 'V', fecha: v.hora });
-                    if(d.existencia > 1) update(rP, { existencia: d.existencia - 1 }); else remove(rP);
-                    lanzarNotif("VENTA", `$${d.precio} - ${d.nombre}`);
-                }
-            } else alert("No registrado.");
+            await html5QrCode.stop();
+            isCamOn = false;
+            btn.innerText = "📷 ENCENDER SCANNER";
+            btn.classList.remove("active");
         }
     }
 
-    onValue(ref(db, 'ventas_actuales/'), (s) => { 
-        vCorte = 0; gCorte = 0; s.forEach(h => { vCorte += h.val().precio; gCorte += (h.val().precio - h.val().costo); }); 
-        document.getElementById('dash-caja').innerText = "$"+vCorte; document.getElementById('fin-corte-real').innerText = "$"+vCorte; document.getElementById('fin-ganancia').innerText = "$"+gCorte.toFixed(2); 
-    });
-    onValue(ref(db, 'ventas_generales/'), (s) => { let total = 0; s.forEach(h => total += h.val().precio); document.getElementById('fin-global').innerText = "$"+total; });
-    onValue(ref(db, 'juguetes/'), (s) => { 
-        let st = 0; let inv = 0; const list = document.getElementById('lista-inv'); list.innerHTML = ""; 
-        s.forEach(h => { const p = h.val(); st += p.existencia; inv += (p.costo * p.existencia); list.innerHTML += `<div class="card"><div><b>${p.nombre}</b><br><span style="color:var(--primary)">$${p.precio}</span></div><b>${p.existencia} pz</b></div>`; }); 
-        document.getElementById('dash-stock').innerText = st; document.getElementById('fin-inversion').innerText = "$"+inv.toFixed(2); 
-    });
+    function registrarVenta() {
+        const cod = document.getElementById('codigo').value;
+        const nom = document.getElementById('nombre').value || "Sin nombre";
+        const inv = parseFloat(document.getElementById('inversion').value) || 0;
+        const vta = parseFloat(document.getElementById('venta').value) || 0;
+        const hora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-    onValue(query(ref(db, 'historial_cortes/'), limitToLast(5)), (s) => {
-        const l = document.getElementById('lista-historial-cortes'); l.innerHTML = "";
-        s.forEach(h => {
-            const c = h.val();
-            l.innerHTML = `<div class="card"><div><small>${c.fecha}</small></div><b style="color:var(--success)">$${c.total}</b></div>` + l.innerHTML;
-        });
-    });
+        if (!cod && nom === "Sin nombre") return;
 
-    window.realizarCorte = async () => { if(vCorte === 0) return alert("Caja vacía"); if(confirm(`¿Cerrar corte con $${vCorte}?`)) { await push(ref(db, 'historial_cortes/'), { total: vCorte, fecha: new Date().toLocaleString() }); await set(ref(db, 'ventas_actuales/'), null); await set(ref(db, 'movimientos/'), null); alert("CORTE REALIZADO"); } };
-    window.crearPedido = () => { const p = prompt("Faltante:"); if(p) push(ref(db, 'pedidos/'), { nombre: p, fecha: new Date().toLocaleDateString() }); };
-    
-    onValue(ref(db, 'pedidos/'), (s) => {
-        const l = document.getElementById('lista-pedidos'); l.innerHTML = "";
-        s.forEach(h => { const id = h.key; l.innerHTML = `<div class="card"><b>${h.val().nombre}</b><button onclick="eliminarPedido('${id}')" style="border:none; background:none;">🗑️</button></div>` + l.innerHTML; });
-    });
-    window.eliminarPedido = (id) => { if(confirm("¿Eliminar?")) remove(ref(db, 'pedidos/'+id)); };
+        const gan = vta - inv;
+        const nuevaVenta = { hora, nom, cod, inv, vta, gan };
+        
+        registroVentas.push(nuevaVenta);
+        totales.inversion += inv;
+        totales.venta += vta;
+        totales.ganancia += gan;
 
-    window.verVentas = (tipo) => {
-        onValue(ref(db, tipo === 'corte' ? 'ventas_actuales/' : 'ventas_generales/'), (s) => {
-            const cont = document.getElementById('contenedor-ventas'); cont.innerHTML = "";
-            s.forEach(h => { cont.innerHTML = `<div class="card"><b>${h.val().nombre}</b> <span>$${h.val().precio}</span></div>` + cont.innerHTML; });
-        }, { onlyOnce: true });
-    };
+        actualizarUI(nuevaVenta);
+        limpiar();
+    }
 
-    window.onload = () => { if(localStorage.getItem('gael_rol')) { MiRol = localStorage.getItem('gael_rol'); setup(); } else { document.getElementById('login-screen').style.display = 'flex'; } };
+    function actualizarUI(v) {
+        document.getElementById('totalInversion').innerText = "$" + totales.inversion.toFixed(2);
+        document.getElementById('totalVenta').innerText = "$" + totales.venta.toFixed(2);
+        document.getElementById('totalGanancia').innerText = "$" + totales.ganancia.toFixed(2);
+        
+        const tabla = document.getElementById('tablaVentas').getElementsByTagName('tbody')[0];
+        const fila = tabla.insertRow(0);
+        fila.innerHTML = `<td>${v.hora}</td><td>${v.nom}</td><td>$${v.vta}</td><td class="ganancia-plus">+$${v.gan}</td>`;
+    }
+
+    function limpiar() {
+        document.getElementById('codigo').value = "";
+        document.getElementById('nombre').value = "";
+        document.getElementById('inversion').value = "";
+        document.getElementById('venta').value = "";
+    }
+
+    function descargarExcel() {
+        if (registroVentas.length === 0) return;
+        let csvContent = "data:text/csv;charset=utf-8,Hora,Producto,Codigo,Inversion,Venta,Ganancia\n";
+        registroVentas.forEach(v => { csvContent += `${v.hora},${v.nom},${v.cod},${v.inv},${v.vta},${v.gan}\n`; });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "corte_caja.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function botonPanico() {
+        if(confirm("¿Borrar todo?")) location.reload();
+    }
 </script>
+
 </body>
 </html>
