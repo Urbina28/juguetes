@@ -3,185 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Venta del Corte</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="VentaCorte">
-    
+    <title>Venta del Corte PRO</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --dark: #1e293b; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #f1f5f9; margin: 0; padding: env(safe-area-inset-top) 10px 20px 10px;
-            display: flex; flex-direction: column; align-items: center; 
-        }
-        .container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 450px; box-sizing: border-box; }
-        
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; min-height: 200px; border: 3px solid var(--primary); }
-        
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; }
-        .stat-card { padding: 12px 5px; border-radius: 12px; text-align: center; color: white; font-weight: bold; }
-        .bg-blue { background: var(--primary); } .bg-orange { background: #f59e0b; } .bg-green { background: var(--success); }
-        .stat-card small { font-size: 0.65rem; display: block; opacity: 0.9; text-transform: uppercase; }
-        .stat-card strong { font-size: 0.9rem; }
-
-        .form-group { margin-bottom: 10px; }
-        input { 
-            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; 
-            box-sizing: border-box; font-size: 16px; -webkit-appearance: none; 
-        }
-        input:focus { border-color: var(--primary); outline: none; }
-        
-        button { 
-            width: 100%; padding: 15px; border: none; border-radius: 12px; cursor: pointer; 
-            font-size: 16px; font-weight: bold; transition: 0.2s; -webkit-tap-highlight-color: transparent;
-        }
-        .btn-add { background: var(--dark); color: white; margin-top: 5px; }
-        .btn-camera { background: #e2e8f0; color: var(--dark); margin-bottom: 15px; font-size: 14px; }
-        .btn-camera.active { background: var(--danger); color: white; }
-        .btn-download { background: var(--success); color: white; margin-top: 15px; }
-        .btn-panic { background: transparent; color: var(--danger); margin-top: 20px; font-size: 12px; text-decoration: underline; }
-
-        .tabla-container { width: 100%; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; }
-        th { background: #f8fafc; padding: 12px 8px; text-align: left; color: #64748b; }
-        td { padding: 12px 8px; border-top: 1px solid #e2e8f0; }
-        .ganancia-plus { color: var(--success); font-weight: bold; }
+        :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --dark: #1e293b; }
+        body { font-family: -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; padding: 15px; border-radius: 20px; width: 100%; max-width: 480px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; min-height: 180px; border: 2px solid var(--primary); margin-bottom: 10px; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 15px; }
+        .stat-card { padding: 8px 4px; border-radius: 10px; text-align: center; color: white; font-size: 11px; }
+        .bg-blue { background: var(--primary); } 
+        .bg-orange { background: var(--warning); }
+        .bg-green { background: var(--success); }
+        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; margin-bottom: 8px; font-size: 16px; box-sizing: border-box; }
+        .row { display: flex; gap: 5px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 8px; }
+        .btn-main { background: var(--dark); color: white; }
+        .aviso-repetido { background: #fef9c3; color: #854d0e; padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; text-align: center; border: 1px solid #fde047; }
+        .tabla-container { width: 100%; margin-top: 10px; max-height: 200px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border-bottom: 1px solid #e2e8f0; padding: 10px 5px; text-align: left; }
+        .btn-del { background: var(--danger); color: white; border: none; padding: 5px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align:center; color: var(--dark); margin-bottom: 15px; font-size: 1.2rem;">Ventas Katy Urbina</h2>
-
+    <h3 style="text-align:center; margin: 0 0 10px 0;">Venta del Corte ☁️</h3>
+    
     <div id="reader"></div>
-    <button id="btnToggleCam" class="btn-camera" onclick="toggleCam()">📷 ENCENDER SCANNER</button>
+    <button onclick="toggleCam()" style="font-size:10px; background:#e2e8f0; color: #333;">📷 SCANNER</button>
+
+    <div id="avisoRepetido" class="aviso-repetido">⚠️ Ya se vendió hoy.</div>
 
     <div class="dashboard">
-        <div class="stat-card bg-blue"><small>Ventas</small><strong id="totalVenta">$0</strong></div>
-        <div class="stat-card bg-orange"><small>Inversión</small><strong id="totalInversion">$0</strong></div>
-        <div class="stat-card bg-green"><small>Ganancia</small><strong id="totalGanancia">$0</strong></div>
+        <div class="stat-card bg-blue">VENTA<br><strong id="totalVenta">$0</strong></div>
+        <div class="stat-card bg-orange">INVERSIÓN<br><strong id="totalInversion">$0</strong></div>
+        <div class="stat-card bg-green">GANANCIA<br><strong id="totalGanancia">$0</strong></div>
     </div>
 
-    <div class="form-group">
-        <input type="text" id="nombre" placeholder="Nombre del producto">
+    <input type="text" id="nombre" placeholder="Nombre del producto" list="sugerencias">
+    <datalist id="sugerencias"></datalist>
+
+    <div class="row">
+        <input type="text" id="codigo" placeholder="Código" style="flex:1.2;">
+        <input type="number" id="cant" value="1" style="flex:0.5;">
     </div>
-    <div style="display: flex; gap: 8px;">
-        <input type="text" id="codigo" placeholder="Código" readonly style="background: #f1f5f9; flex: 1.2;">
-        <input type="number" id="inversion" placeholder="Costo" style="flex: 0.9;">
-        <input type="number" id="venta" placeholder="Venta" style="flex: 0.9;">
+    <div class="row">
+        <input type="number" id="inv" placeholder="Inversión Unit.">
+        <input type="number" id="vta" placeholder="Venta Unit.">
     </div>
 
-    <button class="btn-add" onclick="registrarVenta()">REGISTRAR VENTA</button>
-    
+    <button class="btn-main" onclick="registrarVenta()">💾 REGISTRAR VENTA</button>
+    <button onclick="registrarGasto()" style="background:#fff1f2; color:red; font-size:11px; border: none; width:100%;">💸 REGISTRAR GASTO</button>
+
     <div class="tabla-container">
         <table id="tablaVentas">
-            <thead>
-                <tr>
-                    <th>Hora</th>
-                    <th>Producto</th>
-                    <th>Venta</th>
-                    <th>Gan.</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Hora</th><th>Item</th><th>Cant</th><th>Gan.</th><th></th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
-
-    <button class="btn-download" onclick="descargarExcel()">⬇️ GUARDAR REPORTE (CSV)</button>
-    <button class="btn-panic" onclick="botonPanico()">Borrar sesión actual</button>
 </div>
 
 <script>
-    let registroVentas = [];
-    let totales = { inversion: 0, venta: 0, ganancia: 0 };
-    let html5QrCode = null;
-    let isCamOn = false;
+    const firebaseConfig = {
+        apiKey: "AIzaSyCI85dhteJ5Z4Wgb2A0pes0RI-KdaTAQlM",
+        authDomain: "miinventariojuguetes.firebaseapp.com",
+        databaseURL: "https://miinventariojuguetes-default-rtdb.firebaseio.com",
+        projectId: "miinventariojuguetes",
+        storageBucket: "miinventariojuguetes.firebasestorage.app",
+        messagingSenderId: "872070944528",
+        appId: "1:872070944528:web:aeb9deab706b6de0dcb795"
+    };
 
-    async function toggleCam() {
-        const btn = document.getElementById('btnToggleCam');
-        if (!isCamOn) {
-            html5QrCode = new Html5Qrcode("reader");
-            try {
-                await html5QrCode.start(
-                    { facingMode: "environment" }, 
-                    { fps: 15, qrbox: { width: 250, height: 150 } },
-                    (decodedText) => {
-                        document.getElementById('codigo').value = decodedText;
-                        if (navigator.vibrate) navigator.vibrate(70);
-                        document.getElementById('nombre').focus();
-                    }
-                );
-                isCamOn = true;
-                btn.innerText = "❌ APAGAR SCANNER";
-                btn.classList.add("active");
-            } catch (err) { alert("Cámara no disponible"); }
-        } else {
-            await html5QrCode.stop();
-            isCamOn = false;
-            btn.innerText = "📷 ENCENDER SCANNER";
-            btn.classList.remove("active");
-        }
-    }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const fechaHoy = new Date().toLocaleDateString('en-CA');
+    const refCorte = db.ref('VENTAS_DEL_CORTE/' + fechaHoy);
+    const refMemoria = db.ref('MEMORIA_PRODUCTOS');
+
+    let productosHoy = [];
+    let memoriaGlobal = {};
+    let html5QrCode = null;
+
+    refMemoria.on('value', snap => {
+        memoriaGlobal = snap.val() || {};
+        const dl = document.getElementById('sugerencias');
+        dl.innerHTML = "";
+        Object.keys(memoriaGlobal).forEach(n => dl.innerHTML += `<option value="${n}">`);
+    });
+
+    refCorte.on('value', snap => {
+        const data = snap.val() || { ventas: {}, gastos: 0 };
+        productosHoy = data.ventas ? Object.entries(data.ventas) : [];
+        renderUI(data);
+    });
 
     function registrarVenta() {
-        const cod = document.getElementById('codigo').value;
-        const nom = document.getElementById('nombre').value || "Sin nombre";
-        const inv = parseFloat(document.getElementById('inversion').value) || 0;
-        const vta = parseFloat(document.getElementById('venta').value) || 0;
-        const hora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const nom = document.getElementById('nombre').value;
+        const cod = document.getElementById('codigo').value || "S/C";
+        const cant = parseInt(document.getElementById('cant').value) || 1;
+        const invU = parseFloat(document.getElementById('inv').value) || 0;
+        const vtaU = parseFloat(document.getElementById('vta').value) || 0;
 
-        if (!cod && nom === "Sin nombre") return;
+        if(!nom) return;
 
-        const gan = vta - inv;
-        const nuevaVenta = { hora, nom, cod, inv, vta, gan };
-        
-        registroVentas.push(nuevaVenta);
-        totales.inversion += inv;
-        totales.venta += vta;
-        totales.ganancia += gan;
+        const venta = {
+            hora: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            nom, cod, cant, 
+            invT: invU * cant,
+            vtaT: vtaU * cant, 
+            gan: (vtaU - invU) * cant, 
+            invU, vtaU
+        };
 
-        actualizarUI(nuevaVenta);
+        refCorte.child('ventas').push(venta);
+        refMemoria.child(nom).set({ invU, vtaU, cod });
         limpiar();
     }
 
-    function actualizarUI(v) {
-        document.getElementById('totalInversion').innerText = "$" + totales.inversion.toFixed(2);
-        document.getElementById('totalVenta').innerText = "$" + totales.venta.toFixed(2);
-        document.getElementById('totalGanancia').innerText = "$" + totales.ganancia.toFixed(2);
+    function renderUI(data) {
+        let tV = 0, tG = 0, tI = 0;
+        const tbody = document.querySelector('#tablaVentas tbody');
+        tbody.innerHTML = "";
         
-        const tabla = document.getElementById('tablaVentas').getElementsByTagName('tbody')[0];
-        const fila = tabla.insertRow(0);
-        fila.innerHTML = `<td>${v.hora}</td><td>${v.nom}</td><td>$${v.vta}</td><td class="ganancia-plus">+$${v.gan}</td>`;
+        if(data.ventas) {
+            // Convertimos a array para poder invertir el orden (últimas ventas arriba)
+            const entries = Object.entries(data.ventas).reverse();
+            entries.forEach(([id, v]) => {
+                tV += v.vtaT; tI += v.invT; tG += v.gan;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${v.hora}</td>
+                        <td>${v.nom}</td>
+                        <td>${v.cant}</td>
+                        <td style="color:green; font-weight:bold;">+$${v.gan}</td>
+                        <td><button class="btn-del" onclick="eliminarVenta('${id}')">X</button></td>
+                    </tr>`;
+            });
+        }
+        document.getElementById('totalVenta').innerText = "$" + tV.toFixed(2);
+        document.getElementById('totalInversion').innerText = "$" + tI.toFixed(2);
+        document.getElementById('totalGanancia').innerText = "$" + (tG - (data.gastos || 0)).toFixed(2);
+    }
+
+    function eliminarVenta(id) {
+        if(confirm("¿Eliminar esta venta?")) {
+            refCorte.child('ventas').child(id).remove();
+        }
+    }
+
+    document.getElementById('nombre').addEventListener('input', (e) => {
+        const val = e.target.value;
+        let encontrado = productosHoy.find(([id, p]) => p.nom.toLowerCase() === val.toLowerCase());
+        const aviso = document.getElementById('avisoRepetido');
+        
+        if (encontrado && val !== "") {
+            aviso.style.display = "block";
+            document.getElementById('inv').value = encontrado[1].invU;
+            document.getElementById('vta').value = encontrado[1].vtaU;
+        } else if (memoriaGlobal[val]) {
+            aviso.style.display = "none";
+            document.getElementById('inv').value = memoriaGlobal[val].invU;
+            document.getElementById('vta').value = memoriaGlobal[val].vtaU;
+            document.getElementById('codigo').value = memoriaGlobal[val].cod;
+        } else {
+            aviso.style.display = "none";
+        }
+    });
+
+    function toggleCam() {
+        if(!html5QrCode) {
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({facingMode:"environment"}, {fps:15, qrbox:200}, (text)=>{
+                document.getElementById('codigo').value = text;
+                for(let n in memoriaGlobal) {
+                    if(memoriaGlobal[n].cod === text) {
+                        document.getElementById('nombre').value = n;
+                        document.getElementById('inv').value = memoriaGlobal[n].invU;
+                        document.getElementById('vta').value = memoriaGlobal[n].vtaU;
+                        break;
+                    }
+                }
+                document.getElementById('nombre').focus();
+            });
+        } else { html5QrCode.stop(); html5QrCode = null; }
+    }
+
+    function registrarGasto() {
+        const m = parseFloat(prompt("Monto del gasto:"));
+        if(m > 0) refCorte.child('gastos').transaction(c => (c || 0) + m);
     }
 
     function limpiar() {
-        document.getElementById('codigo').value = "";
-        document.getElementById('nombre').value = "";
-        document.getElementById('inversion').value = "";
-        document.getElementById('venta').value = "";
-    }
-
-    function descargarExcel() {
-        if (registroVentas.length === 0) return;
-        let csvContent = "data:text/csv;charset=utf-8,Hora,Producto,Codigo,Inversion,Venta,Ganancia\n";
-        registroVentas.forEach(v => { csvContent += `${v.hora},${v.nom},${v.cod},${v.inv},${v.vta},${v.gan}\n`; });
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "corte_caja.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    function botonPanico() {
-        if(confirm("¿Borrar todo?")) location.reload();
+        ['nombre','codigo','inv','vta'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('cant').value = 1;
+        document.getElementById('avisoRepetido').style.display = "none";
     }
 </script>
-
 </body>
 </html>
