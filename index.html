@@ -2,14 +2,30 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="VentasCorte">
+    
     <title>Venta del Corte PRO</title>
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    
     <style>
         :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --dark: #1e293b; }
-        body { font-family: -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background: #f1f5f9; 
+            margin: 0; 
+            padding: env(safe-area-inset-top) 10px 10px 10px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
         .container { background: white; padding: 15px; border-radius: 20px; width: 100%; max-width: 480px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; min-height: 180px; border: 2px solid var(--primary); margin-bottom: 10px; }
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 15px; }
@@ -17,26 +33,28 @@
         .bg-blue { background: var(--primary); } 
         .bg-orange { background: var(--warning); }
         .bg-green { background: var(--success); }
-        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; margin-bottom: 8px; font-size: 16px; box-sizing: border-box; }
+        input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 8px; font-size: 16px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--primary); }
         .row { display: flex; gap: 5px; }
-        button { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 8px; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; margin-bottom: 8px; transition: 0.2s; }
+        button:active { transform: scale(0.98); opacity: 0.8; }
         .btn-main { background: var(--dark); color: white; }
         .aviso-repetido { background: #fef9c3; color: #854d0e; padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; text-align: center; border: 1px solid #fde047; }
         .tabla-container { width: 100%; margin-top: 10px; max-height: 200px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th, td { border-bottom: 1px solid #e2e8f0; padding: 10px 5px; text-align: left; }
-        .btn-del { background: var(--danger); color: white; border: none; padding: 5px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; }
+        .btn-del { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 11px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3 style="text-align:center; margin: 0 0 10px 0;">Venta del Corte ☁️</h3>
+    <h3 style="text-align:center; margin: 5px 0 15px 0;">Ventas Katy ☁️</h3>
     
     <div id="reader"></div>
-    <button onclick="toggleCam()" style="font-size:10px; background:#e2e8f0; color: #333;">📷 SCANNER</button>
+    <button onclick="toggleCam()" style="font-size:10px; background:#e2e8f0; color: #333;">📷 ABRIR SCANNER</button>
 
-    <div id="avisoRepetido" class="aviso-repetido">⚠️ Ya se vendió hoy.</div>
+    <div id="avisoRepetido" class="aviso-repetido">⚠️ Este producto ya se vendió hoy.</div>
 
     <div class="dashboard">
         <div class="stat-card bg-blue">VENTA<br><strong id="totalVenta">$0</strong></div>
@@ -44,7 +62,7 @@
         <div class="stat-card bg-green">GANANCIA<br><strong id="totalGanancia">$0</strong></div>
     </div>
 
-    <input type="text" id="nombre" placeholder="Nombre del producto" list="sugerencias">
+    <input type="text" id="nombre" placeholder="Nombre del producto" list="sugerencias" autocomplete="off">
     <datalist id="sugerencias"></datalist>
 
     <div class="row">
@@ -130,7 +148,6 @@
         tbody.innerHTML = "";
         
         if(data.ventas) {
-            // Convertimos a array para poder invertir el orden (últimas ventas arriba)
             const entries = Object.entries(data.ventas).reverse();
             entries.forEach(([id, v]) => {
                 tV += v.vtaT; tI += v.invT; tG += v.gan;
@@ -140,7 +157,7 @@
                         <td>${v.nom}</td>
                         <td>${v.cant}</td>
                         <td style="color:green; font-weight:bold;">+$${v.gan}</td>
-                        <td><button class="btn-del" onclick="eliminarVenta('${id}')">X</button></td>
+                        <td><button class="btn-del" onclick="eliminarVenta('${id}')">✕</button></td>
                     </tr>`;
             });
         }
